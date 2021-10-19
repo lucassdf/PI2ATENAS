@@ -12,12 +12,16 @@
 
 int main()
 {
+	//DEFINICAO DA VARIAVEL DE DISPLAY DO ALLEGRO	
 	ALLEGRO_DISPLAY* display;
 
+	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN, LEFT, RIGHT, UP };
 
+	//DEFINICAO DO FPS
 	const float FPS = 60.0;
 
+	//INICIALIZACAO DA TELA
 	if (!al_init())
 		al_show_native_message_box(NULL, "Error", NULL, "Nao foi possivel iniciar o allegro", NULL, NULL);
 
@@ -29,29 +33,29 @@ int main()
 
 	al_set_window_position(display, 200, 200);
 
+	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
 	float x = 10, y = 10, moveSpeed = 5;
 	int dir = DOWN, sourceX = 32, sourceY = 0;
 
+	//INICIALIZACAO DOS ADDONS DO ALLEGRO
 	al_install_keyboard();
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+
+	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 36, NULL);
-
-	ALLEGRO_BITMAP* player = al_load_bitmap("avatar.png");
-
-	ALLEGRO_KEYBOARD_STATE keyState;
-
-	ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_BITMAP* player = al_load_bitmap("avatar.png");
+    ALLEGRO_KEYBOARD_STATE keyState;
+    ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
-
 	al_start_timer(timer);
 
-
+	//LOOP CONTENDO A LOGICA DO JOGO
 	while (!done)
 	{
 		ALLEGRO_EVENT events;
@@ -64,6 +68,7 @@ int main()
 		}
 		else if (events.type == ALLEGRO_EVENT_TIMER)
 		{
+			//LOGICA DE MOVIMENTACAO DO PERSONAGEM
 			active = true;
 			if (al_key_down(&keyState, ALLEGRO_KEY_S))
 			{
@@ -102,6 +107,7 @@ int main()
 
 		}
 
+		//DESENHO DO PERSONAGEM, TELA, TEXTO E ETC
 		if (draw)
 		{
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
@@ -113,6 +119,7 @@ int main()
 
 	}
 
+	//LIMPEZA DE MEMORIA
 	al_destroy_display(display);
 	al_destroy_timer(timer);
 	al_destroy_bitmap(player);
