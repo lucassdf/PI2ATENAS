@@ -5,10 +5,49 @@
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
 #include <allegro5\allegro_image.h>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
 
 //ALTURA E LARGURA DA TELA
 #define ScreenWidht 640		
 #define ScreenHeight 480
+
+//VARIAVEIS DE POSICAO DO INIMIGO
+int x2 = 600, y2 = 400, dir2 = 1;
+
+//FUNCAO DE MOVIMENTO DO INIMIGO
+void move_inimigo(void);
+
+void move_inimigo(void)
+{
+
+	if (dir2 == 1 && x2 != 20 && y2 != 20)
+	{
+		--x2; 
+		--y2;
+	}
+	else if (dir2 == 2 && x2 != 20 && y2 != ScreenHeight - 50)
+	{
+		--x2;
+		++y2;
+	}
+	else if (dir2 == 3 && x2 != ScreenWidht - 50 && y2 != 20)
+	{
+		++x2;
+		--y2;
+	}
+	else if (dir2 == 4 && x2 != ScreenWidht - 50 && y2 != ScreenHeight - 50)
+	{
+		++x2;
+		++y2;
+	}
+	else
+	{
+		dir2 = rand() % 4 + 1;
+	}
+
+}
 
 int main()
 {
@@ -43,19 +82,23 @@ int main()
 	al_init_image_addon();
 	al_init_font_addon();
 	al_init_ttf_addon();
+	al_init_primitives_addon();
 
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 36, NULL);
     ALLEGRO_BITMAP* player = al_load_bitmap("avatar.png");
+	ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	
+	//LOOP CONTENDO A LOGICA DO JOGO
+	srand(time(NULL));
 	al_start_timer(timer);
 
-	//LOOP CONTENDO A LOGICA DO JOGO
 	while (!done)
 	{
 		ALLEGRO_EVENT events;
@@ -70,22 +113,22 @@ int main()
 		{
 			//LOGICA DE MOVIMENTACAO DO PERSONAGEM
 			active = true;
-			if (al_key_down(&keyState, ALLEGRO_KEY_S))
+			if (al_key_down(&keyState, ALLEGRO_KEY_S) && y < ScreenHeight - 30)
 			{
 				y += moveSpeed;
 				dir = DOWN;
 			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_W))
+			else if (al_key_down(&keyState, ALLEGRO_KEY_W) && y > 0)
 			{
 				y -= moveSpeed;
 				dir = UP;
 			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_D))
+			else if (al_key_down(&keyState, ALLEGRO_KEY_D) && x < ScreenWidht - 30)
 			{
 				x += moveSpeed;
 				dir = RIGHT;
 			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_A))
+			else if (al_key_down(&keyState, ALLEGRO_KEY_A) && x > 0)
 			{
 				x -= moveSpeed;
 				dir = LEFT;
@@ -107,13 +150,16 @@ int main()
 
 		}
 
-		//DESENHO DO PERSONAGEM, TELA, TEXTO E ETC
+		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{
+		
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
+			al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
+			move_inimigo();
 			al_clear_to_color(al_map_rgb(255, 255, 255));
-			al_draw_text(font, al_map_rgb(0, 128, 0), 320, 15, ALLEGRO_ALIGN_CENTRE, "fase 1");
+			al_draw_text(font, al_map_rgb(0, 128, 0), 320, 15, ALLEGRO_ALIGN_CENTRE, "INICIO");
 
 		}
 
@@ -123,6 +169,7 @@ int main()
 	al_destroy_display(display);
 	al_destroy_timer(timer);
 	al_destroy_bitmap(player);
+	al_destroy_bitmap(enemy);
 	al_destroy_event_queue(event_queue);
 	al_destroy_font(font);
 
