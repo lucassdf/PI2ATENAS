@@ -6,7 +6,7 @@
 #include <allegro5\allegro_ttf.h>
 #include <allegro5\allegro_image.h>
 
-
+//ALTURA E LARGURA DA TELA
 #define ScreenWidht 640		
 #define ScreenHeight 480
 
