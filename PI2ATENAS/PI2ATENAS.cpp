@@ -7,7 +7,10 @@
 #include <allegro5\allegro_image.h>
 #include <cstdlib>
 #include <ctime>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "objetos.h"
+
 using namespace std;
 
 
@@ -100,6 +103,10 @@ int main()
 	al_init_font_addon();
 	al_init_ttf_addon();
 	al_init_primitives_addon();
+	al_install_audio();
+	al_init_acodec_addon();
+	al_init_primitives_addon();
+	al_reserve_samples(10);
 
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 36, NULL);
@@ -111,6 +118,17 @@ int main()
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	ALLEGRO_SAMPLE* trilha_sonora = NULL;
+	ALLEGRO_SAMPLE* projeteis_lancados = NULL;
+	ALLEGRO_SAMPLE_INSTANCE* inst_projeteis_lancados = NULL;
+	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
+	trilha_sonora = al_load_sample("trilha_sonora.ogg");
+	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
+	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_trilha_sonora, 0.8);
+
+
 	
 	//LOOP CONTENDO A LOGICA DO JOGO
 	srand(time(NULL));
@@ -121,6 +139,7 @@ int main()
 		ALLEGRO_EVENT events;
 		al_wait_for_event(event_queue, &events);
 		al_get_keyboard_state(&keyState);
+		al_play_sample_instance(inst_trilha_sonora);
 
 
 		if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
@@ -230,6 +249,10 @@ int main()
 	al_destroy_bitmap(enemy);
 	al_destroy_event_queue(event_queue);
 	al_destroy_font(font);
+	al_destroy_sample(trilha_sonora);
+	al_destroy_sample(projeteis_lancados);
+	al_destroy_sample_instance(inst_trilha_sonora);
+	al_destroy_sample_instance(inst_projeteis_lancados);
 
 
 	return 0;
