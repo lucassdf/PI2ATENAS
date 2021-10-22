@@ -7,47 +7,51 @@
 #include <allegro5\allegro_image.h>
 #include <cstdlib>
 #include <ctime>
+#include "objetos.h"
 using namespace std;
 
+
+
+// ---------- PROTÓTIPOS -------------
+
+void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho);
+
+void AtiraBalasCima(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
+void AtiraBalasBaixo(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
+void AtiraBalasEsquerda(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
+void AtiraBalasDireita(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
+
+void AtualizarBalasCima(Projeteis balas[], int tamanho, bool tiros[]);
+void AtualizarBalasBaixo(Projeteis balas[], int tamanho, bool tiros[]);
+void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[]);
+void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
+
+void DesenhaBalas(Projeteis balas[], int tamanho);
+
+
+
+// -------- VARIAVEIS GLOBAIS ----------
+const int NUM_BALAS_C = 8;
+const int NUM_BALAS_B = 8;
+const int NUM_BALAS_E = 8;
+const int NUM_BALAS_D = 8;
+
+//DEFINICAO DO FPS
+const float FPS = 60.0;
+
+
 //ALTURA E LARGURA DA TELA
-#define ScreenWidht 640		
+#define ScreenWidht 640	
 #define ScreenHeight 480
 
 //VARIAVEIS DE POSICAO DO INIMIGO
 int x2 = 600, y2 = 400, dir2 = 1;
 
+enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
+
 //FUNCAO DE MOVIMENTO DO INIMIGO
 void move_inimigo(void);
 
-void move_inimigo(void)
-{
-
-	if (dir2 == 1 && x2 != 20 && y2 != 20)
-	{
-		--x2; 
-		--y2;
-	}
-	else if (dir2 == 2 && x2 != 20 && y2 != ScreenHeight - 50)
-	{
-		--x2;
-		++y2;
-	}
-	else if (dir2 == 3 && x2 != ScreenWidht - 50 && y2 != 20)
-	{
-		++x2;
-		--y2;
-	}
-	else if (dir2 == 4 && x2 != ScreenWidht - 50 && y2 != ScreenHeight - 50)
-	{
-		++x2;
-		++y2;
-	}
-	else
-	{
-		dir2 = rand() % 4 + 1;
-	}
-
-}
 
 int main()
 {
@@ -57,8 +61,7 @@ int main()
 	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN, LEFT, RIGHT, UP };
 
-	//DEFINICAO DO FPS
-	const float FPS = 60.0;
+
 
 	//INICIALIZACAO DA TELA
 	if (!al_init())
@@ -74,8 +77,22 @@ int main()
 
 	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
-	float x = 10, y = 10, moveSpeed = 5;
+	float x = 10, y = 10, moveSpeed = 2;
 	int dir = DOWN, sourceX = 32, sourceY = 0;
+
+	bool tiros[] = { false, false, false, false };
+
+	// ------------ INICIALIZAÇÃO DE OBJETOS --------------
+	Projeteis balas_c[NUM_BALAS_C];
+	Projeteis balas_b[NUM_BALAS_B];
+	Projeteis balas_e[NUM_BALAS_E];
+	Projeteis balas_d[NUM_BALAS_D];
+
+	// -------- FUNÇÕES INICIAIS ---------------
+	InitBalas(balas_c, balas_b, balas_d, balas_e, NUM_BALAS_C);
+	InitBalas(balas_b, balas_c, balas_e, balas_d, NUM_BALAS_B);
+	InitBalas(balas_e, balas_d, balas_b, balas_c, NUM_BALAS_E);
+	InitBalas(balas_d, balas_e, balas_b, balas_c, NUM_BALAS_D);
 
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
 	al_install_keyboard();
@@ -105,10 +122,36 @@ int main()
 		al_wait_for_event(event_queue, &events);
 		al_get_keyboard_state(&keyState);
 
+
 		if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
 			done = true;
 		}
+
+		else if (events.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			switch (events.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_RIGHT:
+				tiros[DIREITA] = true;
+				AtiraBalasDireita(balas_d, NUM_BALAS_D, x, y, tiros);
+				break;
+			case ALLEGRO_KEY_LEFT:
+				tiros[ESQUERDA] = true;
+				AtiraBalasEsquerda(balas_e, NUM_BALAS_E, x, y, tiros);
+				break;
+			case ALLEGRO_KEY_DOWN:
+				tiros[BAIXO] = true;
+				AtiraBalasBaixo(balas_b, NUM_BALAS_B, x, y, tiros);
+				break;
+			case ALLEGRO_KEY_UP:
+				tiros[CIMA] = true;
+				AtiraBalasCima(balas_c, NUM_BALAS_C, x, y, tiros);
+				break;
+			}
+		}
+
+
 		else if (events.type == ALLEGRO_EVENT_TIMER)
 		{
 			//LOGICA DE MOVIMENTACAO DO PERSONAGEM
@@ -146,14 +189,29 @@ int main()
 
 			sourceY = dir;
 
+
 			draw = true;
 
+			if (tiros[DIREITA])
+				AtualizarBalasDireita(balas_d, NUM_BALAS_D, tiros);
+			if (tiros[ESQUERDA])
+				AtualizarBalasEsquerda(balas_e, NUM_BALAS_E, tiros);
+			if (tiros[BAIXO])
+				AtualizarBalasBaixo(balas_b, NUM_BALAS_B, tiros);
+			if (tiros[CIMA])
+				AtualizarBalasCima(balas_c, NUM_BALAS_C, tiros);
+
 		}
+
+
 
 		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{
-		
+			DesenhaBalas(balas_c, NUM_BALAS_C);
+			DesenhaBalas(balas_b, NUM_BALAS_B);
+			DesenhaBalas(balas_e, NUM_BALAS_E);
+			DesenhaBalas(balas_d, NUM_BALAS_D);
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
 			al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
@@ -183,3 +241,204 @@ int main()
 
 }
 
+// -------------- DEFINIÇÃO DE FUNÇÕES E PROCEDIMENTOS ---------------
+
+// ------------- PROJETEIS ----------------
+void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++) {
+		balas_c[i].ID = PROJETIL;
+		balas_c[i].velocidade = 10;
+		balas_c[i].ativo_c = false;
+		balas_b[i].ativo_b = false;
+		balas_d[i].ativo_d = false;
+		balas_e[i].ativo_e = false;
+	}
+}
+
+
+
+void AtiraBalasCima(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
+{
+
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!balas[i].ativo_c)
+		{
+			balas[i].x = x + 23;
+			balas[i].y = y;
+			balas[i].ativo_c = true;
+			break;
+		}
+
+	}
+}
+
+void AtiraBalasDireita(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
+{
+
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!balas[i].ativo_d)
+		{
+			balas[i].x = x + 23;
+			balas[i].y = y;
+			balas[i].ativo_d = true;
+			break;
+		}
+
+	}
+
+}
+void AtiraBalasBaixo(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
+{
+
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!balas[i].ativo_b)
+		{
+			balas[i].x = x + 23;
+			balas[i].y = y;
+			balas[i].ativo_b = true;
+			break;
+		}
+
+	}
+}
+void AtiraBalasEsquerda(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
+{
+
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!balas[i].ativo_e)
+		{
+			balas[i].x = x + 23;
+			balas[i].y = y;
+			balas[i].ativo_e = true;
+			break;
+		}
+
+	}
+
+}
+
+void AtualizarBalasBaixo(Projeteis balas[], int tamanho, bool tiros[])
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo_b)
+		{
+			balas[i].y += balas[i].velocidade;
+
+			if (balas[i].y > 480)
+				balas[i].ativo_b = false;
+
+		}
+
+
+	}
+}
+
+void AtualizarBalasCima(Projeteis balas[], int tamanho, bool tiros[])
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo_c)
+		{
+			balas[i].y -= balas[i].velocidade;
+
+			if (balas[i].y < 0)
+				balas[i].ativo_c = false;
+
+		}
+
+	}
+}
+
+void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[])
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo_e)
+		{
+			balas[i].x -= balas[i].velocidade;
+
+			if (balas[i].x < 0)
+				balas[i].ativo_e = false;
+		}
+
+	}
+}
+
+void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[])
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo_d)
+		{
+			balas[i].x += balas[i].velocidade;
+
+			if (balas[i].x > 680)
+				balas[i].ativo_d = false;
+
+		}
+
+
+	}
+}
+
+
+void DesenhaBalas(Projeteis balas[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo_c)
+		{
+			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+		}
+		if (balas[i].ativo_d)
+		{
+			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+		}
+		if (balas[i].ativo_b)
+		{
+			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+		}
+		if (balas[i].ativo_e)
+		{
+			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+		}
+	}
+}
+
+
+//------------- MOVE O INIMIGO -----------------
+void move_inimigo(void)
+{
+
+	if (dir2 == 1 && x2 != 20 && y2 != 20)
+	{
+		--x2;
+		--y2;
+	}
+	else if (dir2 == 2 && x2 != 20 && y2 != ScreenHeight - 50)
+	{
+		--x2;
+		++y2;
+	}
+	else if (dir2 == 3 && x2 != ScreenWidht - 50 && y2 != 20)
+	{
+		++x2;
+		--y2;
+	}
+	else if (dir2 == 4 && x2 != ScreenWidht - 50 && y2 != ScreenHeight - 50)
+	{
+		++x2;
+		++y2;
+	}
+	else
+	{
+		dir2 = rand() % 4 + 1;
+	}
+
+}
