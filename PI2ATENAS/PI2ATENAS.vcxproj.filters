@@ -28,6 +28,8 @@
     </ClInclude>
     <ClInclude Include="personagem.h">
       <Filter>Arquivos de Cabeçalho</Filter>
+    <ClInclude Include="Objetos.h">
+      <Filter>Arquivos de Origem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
