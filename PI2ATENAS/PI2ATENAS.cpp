@@ -9,47 +9,13 @@
 #include <ctime>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include "inimigo.h"
+#include "personagem.h"
 using namespace std;
 
 //ALTURA E LARGURA DA TELA
 #define ScreenWidht 640		
 #define ScreenHeight 480
-
-//VARIAVEIS DE POSICAO DO INIMIGO
-int x2 = 600, y2 = 400, dir2 = 1;
-
-//FUNCAO DE MOVIMENTO DO INIMIGO
-void move_inimigo(void);
-
-void move_inimigo(void)
-{
-
-	if (dir2 == 1 && x2 != 20 && y2 != 20)
-	{
-		--x2; 
-		--y2;
-	}
-	else if (dir2 == 2 && x2 != 20 && y2 != ScreenHeight - 50)
-	{
-		--x2;
-		++y2;
-	}
-	else if (dir2 == 3 && x2 != ScreenWidht - 50 && y2 != 20)
-	{
-		++x2;
-		--y2;
-	}
-	else if (dir2 == 4 && x2 != ScreenWidht - 50 && y2 != ScreenHeight - 50)
-	{
-		++x2;
-		++y2;
-	}
-	else
-	{
-		dir2 = rand() % 4 + 1;
-	}
-
-}
 
 int main()
 {
@@ -77,7 +43,8 @@ int main()
 	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
 	float x = 10, y = 10, moveSpeed = 5;
-	int dir = DOWN, sourceX = 32, sourceY = 0;
+	int x2 = 200, y2 = 200;
+	int dir = DOWN, dir2 = 1, sourceX = 32, sourceY = 0;
 
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
 	al_install_keyboard();
@@ -129,53 +96,19 @@ int main()
 		}
 		else if (events.type == ALLEGRO_EVENT_TIMER)
 		{
-			//LOGICA DE MOVIMENTACAO DO PERSONAGEM
 			active = true;
-			if (al_key_down(&keyState, ALLEGRO_KEY_S) && y < ScreenHeight - 30)
-			{
-				y += moveSpeed;
-				dir = DOWN;
-			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_W) && y > 0)
-			{
-				y -= moveSpeed;
-				dir = UP;
-			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_D) && x < ScreenWidht - 30)
-			{
-				x += moveSpeed;
-				dir = RIGHT;
-			}
-			else if (al_key_down(&keyState, ALLEGRO_KEY_A) && x > 0)
-			{
-				x -= moveSpeed;
-				dir = LEFT;
-			}
-			else
-				active = false;
-
-			if (active)
-				sourceX += al_get_bitmap_width(player) / 3;
-			else
-				sourceX = 32;
-
-			if (sourceX >= al_get_bitmap_width(player))
-				sourceX = 0;
-
-			sourceY = dir;
-
-			draw = true;
+			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw);
+			move_inimigo(&x2, &y2, &dir2, ScreenHeight, ScreenWidht, enemy);
 
 		}
 
 		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{
-		
+			
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
 			al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
-			move_inimigo();
 			al_clear_to_color(al_map_rgb(255, 255, 255));
 			al_draw_text(font, al_map_rgb(0, 128, 0), 320, 15, ALLEGRO_ALIGN_CENTRE, "INICIO");
 
