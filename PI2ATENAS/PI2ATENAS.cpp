@@ -56,6 +56,7 @@ int main()
 
 	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN, LEFT, RIGHT, UP };
+	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
 
 
 
