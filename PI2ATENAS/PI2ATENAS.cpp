@@ -51,6 +51,8 @@ const float FPS = 60.0;
 #define ScreenWidht 640	
 #define ScreenHeight 480
 
+
+
 int main()
 {
 	//DEFINICAO DA VARIAVEL DE DISPLAY DO ALLEGRO	
@@ -75,7 +77,7 @@ int main()
 	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
 	float x = 10, y = 10, moveSpeed = 5;
-	int x2 = 200, y2 = 200;
+	int x2 = 200, y2 = 200, borda_x2=16, borda_y2=16;
 	int dir = DOWN, dir2 = 1, dir3 = 0, sourceX = 32, sourceY = 0;
 	bool tiros[] = { false, false, false, false };
 	
@@ -177,7 +179,7 @@ int main()
 			active = true;
 			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw);
 			move_inimigo(&x2, &y2, &dir2, ScreenHeight, ScreenWidht, enemy);
-			
+
 			if (tiros[DIREITA])
 				AtualizarBalasDireita(balas_d, NUM_BALAS_D, tiros);
 			if (tiros[ESQUERDA])
@@ -192,8 +194,13 @@ int main()
 			LiberaTiros(atirador, NUM_ATIRADOR);
 			AtualizaAtirador(atirador, NUM_ATIRADOR);
 			
+			//void BalaColidida(Projeteis balas[], int b_tamanho, int c_tamanho, int x2, int y2, int borda_x2, int borda_y2)
+			BalaColidida(balas_b, NUM_BALAS_B, 1, &x2, &y2, borda_x2, borda_y2);
+			BalaColidida(balas_c, NUM_BALAS_C, 1, &x2, &y2, borda_x2, borda_y2);
+			BalaColidida(balas_e, NUM_BALAS_E, 1, &x2, &y2, borda_x2, borda_y2);
+			BalaColidida(balas_d, NUM_BALAS_D, 1, &x2, &y2, borda_x2, borda_y2);
 
-
+		
 		}
 
 

@@ -1,7 +1,7 @@
 ﻿// ------ ARQUIVO OBJETOS -------
 
-
-enum IDS { PROJETEISATIRADOR };
+enum IDS { JOGADOR, PROJETIL, INIMIGOS, PROJETEISATIRADOR};
+enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
 
 struct Projeteis
 {
@@ -44,12 +44,30 @@ void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
 
 void DesenhaBalas(Projeteis balas[], int tamanho);
 
-enum IDS { JOGADOR, PROJETIL, INIMIGOS };
-enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
+void BalaColidida(Projeteis balas[], int b_tamanho, int c_tamanho, int x, int y);
 
 // ------------- PROJETEIS ----------------
 
-
+bool BalaColidida(Projeteis balas[], int b_tamanho, int c_tamanho, int *x2, int *y2, int borda_x2, int borda_y2)
+{
+	for (int i = 0; i < b_tamanho; i++)
+	{
+		if (balas[i].ativo)
+		{
+			for (int j = 0; j < c_tamanho; j++)
+			{
+				if (balas[i].x > (*x2 - borda_x2) &&
+					balas[i].x > (*x2 - borda_x2) &&
+					balas[i].y > (*y2 - borda_y2) &&
+					balas[i].y > (*y2 - borda_y2))
+				{
+					balas[i].ativo = false;
+					return true;
+				}
+			}
+		}
+	}
+}
 
 void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho)
 {
@@ -143,8 +161,6 @@ void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[])
 
 	}
 }
-
-
 
 void DesenhaBalas(Projeteis balas[], int tamanho)
 {
