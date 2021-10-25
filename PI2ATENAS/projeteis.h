@@ -35,13 +35,13 @@ void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[]);
 void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
 void DesenhaBalas(Projeteis balas[], int tamanho);
 void BalaColidida(Projeteis balas[], int b_tamanho, int c_tamanho, int x, int y);
+
 void InitAtirador(Atirador atirador[], int tamanho);
 void LiberaTiros(Atirador atirador[], int tamanho);
 void AtualizaAtirador(Atirador atirador[], int tamanho);
 void InitBalasAtirador(Projeteis balas[], int tamanho);
 void AtiraBalas(Projeteis balas[], int tamanho, Atirador atirador[], int tamanho_a);
 void AtualizaBalasAtirador(Projeteis balas[], int tamanho);
-void DesenhaBalasAtirador(Projeteis balas[], int tamanho);
 void DesenhaAtirador(Atirador atirador[], int tamanho);
 
 // ------------- PROJETEIS ----------------
@@ -162,13 +162,13 @@ void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[])
 	}
 }
 
-void DesenhaBalas(Projeteis balas[], int tamanho)
+void DesenhaBalas(Projeteis balas[], int tamanho, int raio, int rgb1, int rgb2, int rgb3)
 {
 	for (int i = 0; i < tamanho; i++)
 	{
 		if (balas[i].ativo)
 		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+			al_draw_filled_circle(balas[i].x, balas[i].y, raio, al_map_rgb(rgb1, rgb2, rgb3));
 		}
 	}
 }
@@ -242,10 +242,6 @@ void AtualizaAtirador(Atirador atirador[], int  alt, int larg, int tamanho)
 				atirador[i].dir = rand() % 4 + 1;
 			}
 
-			if (atirador[i].x < 0)
-			{
-				atirador[i].ativo = false;
-			}
 		}
 	}
 }
@@ -294,21 +290,10 @@ void AtualizaBalasAtirador(Projeteis balas[], int tamanho)
 			else if (balas[i].dir == 4)
 				balas[i].y += balas[i].velocidade;
 
-			if (balas[i].x < 0 || balas[i].x > 680 || balas[i].y < 0 || balas[i].y > 480)
+			if (balas[i].x < 20 || balas[i].x > 680 || balas[i].y < 20 || balas[i].y > 480)
 				balas[i].ativo = false;
 		}
 
-	}
-}
-
-void DesenhaBalasAtirador(Projeteis balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 8, al_map_rgb(0, 128, 0));
-		}
 	}
 }
 

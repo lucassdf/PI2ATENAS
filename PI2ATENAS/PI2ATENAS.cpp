@@ -187,12 +187,12 @@ int main()
 		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{
-			DesenhaBalas(balas_c, NUM_BALAS_C);
-			DesenhaBalas(balas_b, NUM_BALAS_B);
-			DesenhaBalas(balas_e, NUM_BALAS_E);
-			DesenhaBalas(balas_d, NUM_BALAS_D);
+			DesenhaBalas(balas_c, NUM_BALAS_C,5,0,0,0);
+			DesenhaBalas(balas_b, NUM_BALAS_B,5,0,0,0);
+			DesenhaBalas(balas_e, NUM_BALAS_E,5,0,0,0);
+			DesenhaBalas(balas_d, NUM_BALAS_D,5,0,0,0);
 			DesenhaAtirador(atirador, NUM_ATIRADOR);
-			DesenhaBalasAtirador(balas, NUM_BALASATIRADOR);
+			DesenhaBalas(balas, NUM_BALASATIRADOR,8,0,128,0);
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
 			//al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
