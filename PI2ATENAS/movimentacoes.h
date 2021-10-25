@@ -2,6 +2,7 @@
 #include <cstdlib>
 using namespace std;
 
+
 void move_personagem(ALLEGRO_BITMAP* player, ALLEGRO_KEYBOARD_STATE keyState, int alt, int larg, float *x, float *y, int *dir, float *moveSpeed, bool *active, int *sourceX, int *sourceY, bool *draw) {
 
 	enum Direction { DOWN, LEFT, RIGHT, UP };
@@ -54,36 +55,5 @@ void move_personagem(ALLEGRO_BITMAP* player, ALLEGRO_KEYBOARD_STATE keyState, in
 
 	*draw = true;
 
-
-}
-
-//FUNCAO DE MOVIMENTO DO INIMIGO
-void move_inimigo(int* x, int* y, int* dir, int alt, int larg, ALLEGRO_BITMAP* inimigo)
-{
-
-	if (*dir == 1 && *x != 20 && *y != 20)
-	{
-		--* x;
-		--* y;
-	}
-	else if (*dir == 2 && *x != 20 && *y != alt - 50)
-	{
-		--* x;
-		++* y;
-	}
-	else if (*dir == 3 && *x != larg - 50 && *y != 20)
-	{
-		++* x;
-		--* y;
-	}
-	else if (*dir == 4 && *x != larg - 50 && *y != alt - 50)
-	{
-		++* x;
-		++* y;
-	}
-	else
-	{
-		*dir = rand() % 4 + 1;
-	}
 
 }
