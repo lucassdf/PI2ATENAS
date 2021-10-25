@@ -21,6 +21,7 @@ struct Atirador {
 	int borda_x;
 	int borda_y;
 	int dir;
+	int vida;
 	bool ativo;
 };
 
@@ -60,7 +61,9 @@ void BalaColidida(Projeteis balas[], int b_tamanho, Atirador atirador[], int c_t
 						balas[i].y < (atirador[j].y + atirador[j].borda_y))
 					{
 						balas[i].ativo = false;
-						atirador[j].ativo = false;
+						--atirador[j].vida;
+						if(atirador[j].vida <= 0)
+							atirador[j].ativo = false;
 					}
 				}
 			}
@@ -188,7 +191,7 @@ void LiberaTiros(Atirador atirador[], int tamanho)
 	{
 		if (!atirador[i].ativo)
 		{
-
+			atirador[i].vida = 3;
 			atirador[i].x = rand() % 400 + 30;
 			atirador[i].y = rand() % 400 + 30;
 			atirador[i].ativo = true;
