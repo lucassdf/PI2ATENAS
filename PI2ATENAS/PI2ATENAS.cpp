@@ -18,6 +18,7 @@ using namespace std;
 
 
 
+
 // -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
 const int NUM_BALAS_C = 8;
 const int NUM_BALAS_B = 8;

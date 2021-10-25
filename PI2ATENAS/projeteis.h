@@ -1,6 +1,28 @@
 ﻿// ------ ARQUIVO OBJETOS -------
 
+enum IDS { JOGADOR, PROJETIL, INIMIGOS, PROJETEISATIRADOR };
+enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
+
 struct Projeteis
+{
+	int ID;
+	int x;
+	int y;
+	int velocidade;
+	bool ativo;
+};
+
+struct Atirador {
+	int ID;
+	int x;
+	int y;
+	int velocidade;
+	int borda_x;
+	int borda_y;
+	bool ativo;
+};
+
+struct ProjeteisAtirador
 {
 	int ID;
 	int x;
@@ -22,8 +44,6 @@ void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
 
 void DesenhaBalas(Projeteis balas[], int tamanho);
 
-enum IDS { JOGADOR, PROJETIL, INIMIGOS };
-enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
 
 // ------------- PROJETEIS ----------------
 
