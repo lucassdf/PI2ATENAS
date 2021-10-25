@@ -30,3 +30,4 @@ void move_inimigo(int *x, int *y, int *dir, int alt, int larg, ALLEGRO_BITMAP* i
 	}
 
 }
+

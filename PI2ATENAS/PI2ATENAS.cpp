@@ -9,6 +9,7 @@
 #include <ctime>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <time.h>
 #include "inimigo.h"
 #include "personagem.h"
 #include "objetos.h"
@@ -16,8 +17,15 @@
 using namespace std;
 
 
+// -------- VARIAVEIS GLOBAIS ----------
+const int NUM_BALAS_C = 8;
+const int NUM_BALAS_B = 8;
+const int NUM_BALAS_E = 8;
+const int NUM_BALAS_D = 8;
+const int NUM_ATIRADOR = 2;
+const int NUM_BALASATIRADOR = 4;
 
-// ---------- PROT�TIPOS -------------
+// ---------- PROTÓTIPOS -------------
 
 void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho);
 
@@ -33,13 +41,18 @@ void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
 
 void DesenhaBalas(Projeteis balas[], int tamanho);
 
+void InitAtirador(Atirador atirador[], int tamanho);
+void LiberaTiros(Atirador atirador[], int tamanho);
+void AtualizaAtirador(Atirador atirador[], int tamanho);
+
+void InitBalasAtirador(ProjeteisAtirador balas[], int tamanho);
+void AtiraBalas(ProjeteisAtirador balas[], int tamanho);
+void AtualizaBalasAtirador(ProjeteisAtirador balas[], int tamanho);
+void DesenhaBalasAtirador(ProjeteisAtirador balas[], int tamanho);
 
 
-// -------- VARIAVEIS GLOBAIS ----------
-const int NUM_BALAS_C = 8;
-const int NUM_BALAS_B = 8;
-const int NUM_BALAS_E = 8;
-const int NUM_BALAS_D = 8;
+void DesenhaAtirador(Atirador atirador[], int tamanho);
+
 
 //DEFINICAO DO FPS
 const float FPS = 60.0;
@@ -79,18 +92,25 @@ int main()
 	int dir = DOWN, dir2 = 1, sourceX = 32, sourceY = 0;
 
 	bool tiros[] = { false, false, false, false };
+	
 
 	// ------------ INICIALIZA��O DE OBJETOS --------------
 	Projeteis balas_c[NUM_BALAS_C];
 	Projeteis balas_b[NUM_BALAS_B];
 	Projeteis balas_e[NUM_BALAS_E];
 	Projeteis balas_d[NUM_BALAS_D];
+	Atirador atirador[NUM_ATIRADOR];
+	ProjeteisAtirador balas[NUM_BALASATIRADOR];
+
 
 	// -------- FUN��ES INICIAIS ---------------
 	InitBalas(balas_c, balas_b, balas_d, balas_e, NUM_BALAS_C);
 	InitBalas(balas_b, balas_c, balas_e, balas_d, NUM_BALAS_B);
 	InitBalas(balas_e, balas_d, balas_b, balas_c, NUM_BALAS_E);
 	InitBalas(balas_d, balas_e, balas_b, balas_c, NUM_BALAS_D);
+	InitAtirador(atirador, NUM_ATIRADOR);
+	InitBalasAtirador(balas, NUM_BALASATIRADOR);
+
 
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
 	al_install_keyboard();
@@ -181,6 +201,13 @@ int main()
 			if (tiros[CIMA])
 				AtualizarBalasCima(balas_c, NUM_BALAS_C, tiros);
 
+			AtualizaBalasAtirador(balas, NUM_BALASATIRADOR);
+			AtiraBalas(balas, NUM_BALASATIRADOR);
+			LiberaTiros(atirador, NUM_ATIRADOR);
+			AtualizaAtirador(atirador, NUM_ATIRADOR);
+			
+
+
 		}
 
 
@@ -192,6 +219,8 @@ int main()
 			DesenhaBalas(balas_b, NUM_BALAS_B);
 			DesenhaBalas(balas_e, NUM_BALAS_E);
 			DesenhaBalas(balas_d, NUM_BALAS_D);
+			DesenhaAtirador(atirador, NUM_ATIRADOR);
+			DesenhaBalasAtirador(balas, NUM_BALASATIRADOR);
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
 			al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
@@ -231,7 +260,7 @@ void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Pr
 {
 	for (int i = 0; i < tamanho; i++) {
 		balas_c[i].ID = PROJETIL;
-		balas_c[i].velocidade = 10;
+		balas_c[i].velocidade = 6;
 		balas_c[i].ativo_c = false;
 		balas_b[i].ativo_b = false;
 		balas_d[i].ativo_d = false;
@@ -390,6 +419,124 @@ void DesenhaBalas(Projeteis balas[], int tamanho)
 		if (balas[i].ativo_e)
 		{
 			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
+		}
+	}
+}
+
+
+
+//__________________________________________________
+//----------------- ATIRADOR ----------------------
+
+void InitAtirador(Atirador atirador[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		atirador[i].ID = INIMIGOS;
+		atirador[i].velocidade = 5;
+		atirador[i].borda_x = 18;
+		atirador[i].borda_y = 18;
+		atirador[i].ativo = false;
+	}
+}
+
+void LiberaTiros(Atirador atirador[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!atirador[i].ativo)
+		{
+			
+				atirador[i].x = 30;
+				atirador[i].y = 100;
+				atirador[i].ativo = true;
+	
+
+			/*if (rand() % 500 == 0)
+			{
+				atirador[i].x = 1;
+				atirador[i].y = 5;
+				atirador[i].ativo = true;
+				break;
+			}*/
+		}
+	}
+}
+
+void AtualizaAtirador(Atirador atirador[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (atirador[i].ativo)
+		{
+			//atirador[i].x -= atirador[i].velocidade;
+			atirador[i].x = 560;
+
+			if (atirador[i].x < 0)
+			{
+				atirador[i].ativo = false;
+			}
+		}
+	}
+}
+
+void InitBalasAtirador(ProjeteisAtirador balas[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++) {
+		balas[i].ID = PROJETEISATIRADOR;
+		balas[i].velocidade = 10;
+		balas[i].ativo = false;
+	}
+}
+
+void AtiraBalas(ProjeteisAtirador balas[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (!balas[i].ativo)
+		{
+			balas[i].x = 530;
+			balas[i].y = 100;
+			balas[i].ativo = true;
+			break;
+		}
+
+	}
+}
+
+void AtualizaBalasAtirador(ProjeteisAtirador balas[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo)
+		{
+			balas[i].x -= balas[i].velocidade;
+
+			if (balas[i].x < 0)
+				balas[i].ativo = false;
+		}
+
+	}
+}
+
+void DesenhaBalasAtirador(ProjeteisAtirador balas[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (balas[i].ativo)
+		{
+			al_draw_filled_circle(balas[i].x, balas[i].y, 8, al_map_rgb(255, 0, 255));
+		}
+	}
+}
+
+void DesenhaAtirador(Atirador atirador[], int tamanho)
+{
+	for (int i = 0; i < tamanho; i++)
+	{
+		if (atirador[i].ativo)
+		{
+			al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgb(255, 255, 0));
 		}
 	}
 }
