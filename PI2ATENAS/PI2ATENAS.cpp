@@ -10,14 +10,15 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <time.h>
-#include "inimigo.h"
-#include "personagem.h"
-#include "objetos.h"
+#include "movimentacoes.h"
+#include "projeteis.h"
+
 
 using namespace std;
 
 
-// -------- VARIAVEIS GLOBAIS ----------
+
+// -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
 const int NUM_BALAS_C = 8;
 const int NUM_BALAS_B = 8;
 const int NUM_BALAS_E = 8;
@@ -27,19 +28,6 @@ const int NUM_BALASATIRADOR = 4;
 
 // ---------- PROTÓTIPOS -------------
 
-void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho);
-
-void AtiraBalasCima(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
-void AtiraBalasBaixo(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
-void AtiraBalasEsquerda(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
-void AtiraBalasDireita(Projeteis balas[], int tamanho, float x, float y, bool tiros[]);
-
-void AtualizarBalasCima(Projeteis balas[], int tamanho, bool tiros[]);
-void AtualizarBalasBaixo(Projeteis balas[], int tamanho, bool tiros[]);
-void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[]);
-void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
-
-void DesenhaBalas(Projeteis balas[], int tamanho);
 
 void InitAtirador(Atirador atirador[], int tamanho);
 void LiberaTiros(Atirador atirador[], int tamanho);
@@ -53,11 +41,12 @@ void DesenhaBalasAtirador(ProjeteisAtirador balas[], int tamanho);
 
 void DesenhaAtirador(Atirador atirador[], int tamanho);
 
-
+Projeteis balas_c[NUM_BALAS_C];
+Projeteis balas_b[NUM_BALAS_B];
+Projeteis balas_e[NUM_BALAS_E];
+Projeteis balas_d[NUM_BALAS_D];
 //DEFINICAO DO FPS
 const float FPS = 60.0;
-
-
 //ALTURA E LARGURA DA TELA
 #define ScreenWidht 640	
 #define ScreenHeight 480
@@ -70,8 +59,6 @@ int main()
 	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN, LEFT, RIGHT, UP };
 	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
-
-
 
 	//INICIALIZACAO DA TELA
 	if (!al_init())
@@ -89,8 +76,7 @@ int main()
 	bool done = false, draw = true, active = false;
 	float x = 10, y = 10, moveSpeed = 5;
 	int x2 = 200, y2 = 200;
-	int dir = DOWN, dir2 = 1, sourceX = 32, sourceY = 0;
-
+	int dir = DOWN, dir2 = 1, dir3 = 0, sourceX = 32, sourceY = 0;
 	bool tiros[] = { false, false, false, false };
 	
 
@@ -168,19 +154,19 @@ int main()
 			{
 			case ALLEGRO_KEY_RIGHT:
 				tiros[DIREITA] = true;
-				AtiraBalasDireita(balas_d, NUM_BALAS_D, x, y, tiros);
+				AtiraBalas(balas_d, NUM_BALAS_D, x, y, tiros);
 				break;
 			case ALLEGRO_KEY_LEFT:
 				tiros[ESQUERDA] = true;
-				AtiraBalasEsquerda(balas_e, NUM_BALAS_E, x, y, tiros);
+				AtiraBalas(balas_e, NUM_BALAS_E, x, y, tiros);
 				break;
 			case ALLEGRO_KEY_DOWN:
 				tiros[BAIXO] = true;
-				AtiraBalasBaixo(balas_b, NUM_BALAS_B, x, y, tiros);
+				AtiraBalas(balas_b, NUM_BALAS_B, x, y, tiros);
 				break;
 			case ALLEGRO_KEY_UP:
 				tiros[CIMA] = true;
-				AtiraBalasCima(balas_c, NUM_BALAS_C, x, y, tiros);
+				AtiraBalas(balas_c, NUM_BALAS_C, x, y, tiros);
 				break;
 			}
 		}
@@ -191,7 +177,7 @@ int main()
 			active = true;
 			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw);
 			move_inimigo(&x2, &y2, &dir2, ScreenHeight, ScreenWidht, enemy);
-
+			
 			if (tiros[DIREITA])
 				AtualizarBalasDireita(balas_d, NUM_BALAS_D, tiros);
 			if (tiros[ESQUERDA])
@@ -254,175 +240,6 @@ int main()
 }
 
 // -------------- DEFINI��O DE FUN��ES E PROCEDIMENTOS ---------------
-
-// ------------- PROJETEIS ----------------
-void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Projeteis balas_d[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++) {
-		balas_c[i].ID = PROJETIL;
-		balas_c[i].velocidade = 6;
-		balas_c[i].ativo_c = false;
-		balas_b[i].ativo_b = false;
-		balas_d[i].ativo_d = false;
-		balas_e[i].ativo_e = false;
-	}
-}
-
-
-
-void AtiraBalasCima(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
-{
-
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!balas[i].ativo_c)
-		{
-			balas[i].x = x + 23;
-			balas[i].y = y;
-			balas[i].ativo_c = true;
-			break;
-		}
-
-	}
-}
-
-void AtiraBalasDireita(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
-{
-
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!balas[i].ativo_d)
-		{
-			balas[i].x = x + 23;
-			balas[i].y = y;
-			balas[i].ativo_d = true;
-			break;
-		}
-
-	}
-
-}
-void AtiraBalasBaixo(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
-{
-
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!balas[i].ativo_b)
-		{
-			balas[i].x = x + 23;
-			balas[i].y = y;
-			balas[i].ativo_b = true;
-			break;
-		}
-
-	}
-}
-void AtiraBalasEsquerda(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
-{
-
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!balas[i].ativo_e)
-		{
-			balas[i].x = x + 23;
-			balas[i].y = y;
-			balas[i].ativo_e = true;
-			break;
-		}
-
-	}
-
-}
-
-void AtualizarBalasBaixo(Projeteis balas[], int tamanho, bool tiros[])
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo_b)
-		{
-			balas[i].y += balas[i].velocidade;
-
-			if (balas[i].y > 480)
-				balas[i].ativo_b = false;
-
-		}
-
-
-	}
-}
-
-void AtualizarBalasCima(Projeteis balas[], int tamanho, bool tiros[])
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo_c)
-		{
-			balas[i].y -= balas[i].velocidade;
-
-			if (balas[i].y < 0)
-				balas[i].ativo_c = false;
-
-		}
-
-	}
-}
-
-void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[])
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo_e)
-		{
-			balas[i].x -= balas[i].velocidade;
-
-			if (balas[i].x < 0)
-				balas[i].ativo_e = false;
-		}
-
-	}
-}
-
-void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[])
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo_d)
-		{
-			balas[i].x += balas[i].velocidade;
-
-			if (balas[i].x > 680)
-				balas[i].ativo_d = false;
-
-		}
-
-
-	}
-}
-
-
-void DesenhaBalas(Projeteis balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo_c)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
-		}
-		if (balas[i].ativo_d)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
-		}
-		if (balas[i].ativo_b)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
-		}
-		if (balas[i].ativo_e)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 5, al_map_rgb(0, 0, 0));
-		}
-	}
-}
-
 
 
 //__________________________________________________
