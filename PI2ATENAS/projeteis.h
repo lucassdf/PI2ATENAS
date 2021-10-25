@@ -34,6 +34,7 @@ void AtualizarBalasBaixo(Projeteis balas[], int tamanho, bool tiros[]);
 void AtualizarBalasEsquerda(Projeteis balas[], int tamanho, bool tiros[]);
 void AtualizarBalasDireita(Projeteis balas[], int tamanho, bool tiros[]);
 void DesenhaBalas(Projeteis balas[], int tamanho);
+
 void BalaColidida(Projeteis balas[], int b_tamanho, int c_tamanho, int x, int y);
 
 void InitAtirador(Atirador atirador[], int tamanho);
@@ -82,7 +83,6 @@ void InitBalas(Projeteis balas_c[], Projeteis balas_b[], Projeteis balas_e[], Pr
 
 void AtiraBalas(Projeteis balas[], int tamanho, float x, float y, bool tiros[])
 {
-
 	for (int i = 0; i < tamanho; i++)
 	{
 		if (!balas[i].ativo)
@@ -181,6 +181,7 @@ void InitAtirador(Atirador atirador[], int tamanho)
 		atirador[i].velocidade = 5;
 		atirador[i].borda_x = 18;
 		atirador[i].borda_y = 18;
+		atirador[i].vida = 3;
 		atirador[i].ativo = false;
 	}
 }
@@ -189,9 +190,8 @@ void LiberaTiros(Atirador atirador[], int tamanho)
 {
 	for (int i = 0; i < tamanho; i++)
 	{
-		if (!atirador[i].ativo)
+		if (!atirador[i].ativo && atirador[i].vida > 0)
 		{
-			atirador[i].vida = 3;
 			atirador[i].x = rand() % 400 + 30;
 			atirador[i].y = rand() % 400 + 30;
 			atirador[i].ativo = true;
@@ -259,7 +259,7 @@ void AtiraBalas(Projeteis balas[], int tamanho, Atirador atirador[], int tamanho
 {
 	for (int i = 0; i < tamanho; i++)
 	{
-		if (!balas[i].ativo)
+		if (!balas[i].ativo && atirador[i].vida > 0)
 		{
 			for (int j = 0; j < tamanho_a; j++)
 			{

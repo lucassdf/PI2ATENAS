@@ -15,12 +15,12 @@
 using namespace std;
 
 // -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
-const int NUM_BALAS_C = 8;
-const int NUM_BALAS_B = 8;
-const int NUM_BALAS_E = 8;
-const int NUM_BALAS_D = 8;
-const int NUM_ATIRADOR = 2;
-const int NUM_BALASATIRADOR = 4;
+const int NUM_BALAS_C = 4;
+const int NUM_BALAS_B = 4;
+const int NUM_BALAS_E = 4;
+const int NUM_BALAS_D = 4;
+const int NUM_ATIRADOR = 5;
+const int NUM_BALASATIRADOR = 2;
 
 // ---------- PROTÓTIPOS -------------
 Projeteis balas_c[NUM_BALAS_C];
