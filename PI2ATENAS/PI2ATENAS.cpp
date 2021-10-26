@@ -12,36 +12,19 @@
 #include <time.h>
 #include "movimentacoes.h"
 #include "projeteis.h"
-
-
 using namespace std;
 
 
 
-
 // -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
-const int NUM_BALAS_C = 8;
-const int NUM_BALAS_B = 8;
-const int NUM_BALAS_E = 8;
-const int NUM_BALAS_D = 8;
-const int NUM_ATIRADOR = 2;
-const int NUM_BALASATIRADOR = 4;
+const int NUM_BALAS_C = 4;
+const int NUM_BALAS_B = 4;
+const int NUM_BALAS_E = 4;
+const int NUM_BALAS_D = 4;
+const int NUM_ATIRADOR = 5;
+const int NUM_BALASATIRADOR = 2;
 
 // ---------- PROTÓTIPOS -------------
-
-
-void InitAtirador(Atirador atirador[], int tamanho);
-void LiberaTiros(Atirador atirador[], int tamanho);
-void AtualizaAtirador(Atirador atirador[], int tamanho);
-
-void InitBalasAtirador(ProjeteisAtirador balas[], int tamanho);
-void AtiraBalas(ProjeteisAtirador balas[], int tamanho);
-void AtualizaBalasAtirador(ProjeteisAtirador balas[], int tamanho);
-void DesenhaBalasAtirador(ProjeteisAtirador balas[], int tamanho);
-
-
-void DesenhaAtirador(Atirador atirador[], int tamanho);
-
 Projeteis balas_c[NUM_BALAS_C];
 Projeteis balas_b[NUM_BALAS_B];
 Projeteis balas_e[NUM_BALAS_E];
@@ -76,7 +59,7 @@ int main()
 	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
 	float x = 10, y = 10, moveSpeed = 5;
-	int x2 = 200, y2 = 200;
+	int x2 = 200, y2 = 200, borda_x2=16, borda_y2=16;
 	int dir = DOWN, dir2 = 1, dir3 = 0, sourceX = 32, sourceY = 0;
 	bool tiros[] = { false, false, false, false };
 	
@@ -87,7 +70,7 @@ int main()
 	Projeteis balas_e[NUM_BALAS_E];
 	Projeteis balas_d[NUM_BALAS_D];
 	Atirador atirador[NUM_ATIRADOR];
-	ProjeteisAtirador balas[NUM_BALASATIRADOR];
+	Projeteis balas[NUM_BALASATIRADOR];
 
 
 	// -------- FUN��ES INICIAIS ---------------
@@ -113,7 +96,7 @@ int main()
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 36, NULL);
     ALLEGRO_BITMAP* player = al_load_bitmap("avatar.png");
-	ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
+	//ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
@@ -177,8 +160,7 @@ int main()
 		{
 			active = true;
 			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw);
-			move_inimigo(&x2, &y2, &dir2, ScreenHeight, ScreenWidht, enemy);
-			
+	
 			if (tiros[DIREITA])
 				AtualizarBalasDireita(balas_d, NUM_BALAS_D, tiros);
 			if (tiros[ESQUERDA])
@@ -188,13 +170,18 @@ int main()
 			if (tiros[CIMA])
 				AtualizarBalasCima(balas_c, NUM_BALAS_C, tiros);
 
+			AtiraBalas(balas, NUM_BALASATIRADOR, atirador, NUM_ATIRADOR);
 			AtualizaBalasAtirador(balas, NUM_BALASATIRADOR);
-			AtiraBalas(balas, NUM_BALASATIRADOR);
 			LiberaTiros(atirador, NUM_ATIRADOR);
-			AtualizaAtirador(atirador, NUM_ATIRADOR);
+			AtualizaAtirador(atirador, ScreenHeight, ScreenWidht, NUM_ATIRADOR);
 			
+			BalaColidida(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR);
+			BalaColidida(balas_c, NUM_BALAS_C, atirador, NUM_ATIRADOR);
+			BalaColidida(balas_d, NUM_BALAS_D, atirador, NUM_ATIRADOR);
+			BalaColidida(balas_e, NUM_BALAS_E, atirador, NUM_ATIRADOR);
 
-
+			
+		
 		}
 
 
@@ -202,14 +189,14 @@ int main()
 		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{
-			DesenhaBalas(balas_c, NUM_BALAS_C);
-			DesenhaBalas(balas_b, NUM_BALAS_B);
-			DesenhaBalas(balas_e, NUM_BALAS_E);
-			DesenhaBalas(balas_d, NUM_BALAS_D);
+			DesenhaBalas(balas_c, NUM_BALAS_C,5,0,0,0);
+			DesenhaBalas(balas_b, NUM_BALAS_B,5,0,0,0);
+			DesenhaBalas(balas_e, NUM_BALAS_E,5,0,0,0);
+			DesenhaBalas(balas_d, NUM_BALAS_D,5,0,0,0);
 			DesenhaAtirador(atirador, NUM_ATIRADOR);
-			DesenhaBalasAtirador(balas, NUM_BALASATIRADOR);
+			DesenhaBalas(balas, NUM_BALASATIRADOR,8,0,128,0);
 			al_draw_bitmap_region(player, sourceX, sourceY * al_get_bitmap_height(player) / 4, 32, 32, x, y, NULL);
-			al_draw_bitmap(enemy, x2, y2, NULL);
+			//al_draw_bitmap(enemy, x2, y2, NULL);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(255, 255, 255));
 			al_draw_text(font, al_map_rgb(0, 128, 0), 320, 15, ALLEGRO_ALIGN_CENTRE, "INICIO");
@@ -222,7 +209,7 @@ int main()
 	al_destroy_display(display);
 	al_destroy_timer(timer);
 	al_destroy_bitmap(player);
-	al_destroy_bitmap(enemy);
+	//al_destroy_bitmap(enemy);
 	al_destroy_event_queue(event_queue);
 	al_destroy_font(font);
 	al_destroy_sample(trilha_sonora);
@@ -238,123 +225,4 @@ int main()
 
 
 
-}
-
-// -------------- DEFINI��O DE FUN��ES E PROCEDIMENTOS ---------------
-
-
-//__________________________________________________
-//----------------- ATIRADOR ----------------------
-
-void InitAtirador(Atirador atirador[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		atirador[i].ID = INIMIGOS;
-		atirador[i].velocidade = 5;
-		atirador[i].borda_x = 18;
-		atirador[i].borda_y = 18;
-		atirador[i].ativo = false;
-	}
-}
-
-void LiberaTiros(Atirador atirador[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!atirador[i].ativo)
-		{
-			
-				atirador[i].x = 30;
-				atirador[i].y = 100;
-				atirador[i].ativo = true;
-	
-
-			/*if (rand() % 500 == 0)
-			{
-				atirador[i].x = 1;
-				atirador[i].y = 5;
-				atirador[i].ativo = true;
-				break;
-			}*/
-		}
-	}
-}
-
-void AtualizaAtirador(Atirador atirador[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (atirador[i].ativo)
-		{
-			//atirador[i].x -= atirador[i].velocidade;
-			atirador[i].x = 560;
-
-			if (atirador[i].x < 0)
-			{
-				atirador[i].ativo = false;
-			}
-		}
-	}
-}
-
-void InitBalasAtirador(ProjeteisAtirador balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++) {
-		balas[i].ID = PROJETEISATIRADOR;
-		balas[i].velocidade = 10;
-		balas[i].ativo = false;
-	}
-}
-
-void AtiraBalas(ProjeteisAtirador balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (!balas[i].ativo)
-		{
-			balas[i].x = 530;
-			balas[i].y = 100;
-			balas[i].ativo = true;
-			break;
-		}
-
-	}
-}
-
-void AtualizaBalasAtirador(ProjeteisAtirador balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo)
-		{
-			balas[i].x -= balas[i].velocidade;
-
-			if (balas[i].x < 0)
-				balas[i].ativo = false;
-		}
-
-	}
-}
-
-void DesenhaBalasAtirador(ProjeteisAtirador balas[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (balas[i].ativo)
-		{
-			al_draw_filled_circle(balas[i].x, balas[i].y, 8, al_map_rgb(255, 0, 255));
-		}
-	}
-}
-
-void DesenhaAtirador(Atirador atirador[], int tamanho)
-{
-	for (int i = 0; i < tamanho; i++)
-	{
-		if (atirador[i].ativo)
-		{
-			al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgb(255, 255, 0));
-		}
-	}
 }
