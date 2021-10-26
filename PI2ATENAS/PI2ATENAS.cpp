@@ -10,6 +10,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <time.h>
+#include <string>
 #include "movimentacoes.h"
 #include "projeteis.h"
 using namespace std;
@@ -19,7 +20,7 @@ const int NUM_BALAS_C = 4;
 const int NUM_BALAS_B = 4;
 const int NUM_BALAS_E = 4;
 const int NUM_BALAS_D = 4;
-const int NUM_ATIRADOR = 5;
+const int NUM_ATIRADOR = 3;
 const int NUM_BALASATIRADOR = 2;
 
 // ---------- PROTÓTIPOS -------------
@@ -56,12 +57,11 @@ int main()
 
 	//VARIAVEIS DE SUPORTE
 	bool done = false, draw = true, active = false;
-	float x = 10, y = 10, moveSpeed = 5;
-	int x2 = 200, y2 = 200, borda_x2=16, borda_y2=16;
+	int x = 10, y = 10, moveSpeed = 5;
+	int x2 = 200, y2 = 200, borda_x = 16, borda_y=16, borda_x2=16, borda_y2=16;
 	int dir = DOWN, dir2 = 1, dir3 = 0, sourceX = 32, sourceY = 0;
 	bool tiros[] = { false, false, false, false };
 	
-
 	// ------------ INICIALIZA��O DE OBJETOS --------------
 	Projeteis balas_c[NUM_BALAS_C];
 	Projeteis balas_b[NUM_BALAS_B];
@@ -72,12 +72,12 @@ int main()
 
 
 	// -------- FUN��ES INICIAIS ---------------
-	InitBalas(balas_c, balas_b, balas_d, balas_e, NUM_BALAS_C);
-	InitBalas(balas_b, balas_c, balas_e, balas_d, NUM_BALAS_B);
-	InitBalas(balas_e, balas_d, balas_b, balas_c, NUM_BALAS_E);
-	InitBalas(balas_d, balas_e, balas_b, balas_c, NUM_BALAS_D);
+	InitBalas(balas_c, NUM_BALAS_C, "personagem");
+	InitBalas(balas_b, NUM_BALAS_B, "personagem");
+	InitBalas(balas_e, NUM_BALAS_E, "personagem");
+	InitBalas(balas_d, NUM_BALAS_D, "personagem");
 	InitAtirador(atirador, NUM_ATIRADOR);
-	InitBalasAtirador(balas, NUM_BALASATIRADOR);
+	InitBalas(balas, NUM_BALASATIRADOR, "atirador");
 
 
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
@@ -136,19 +136,19 @@ int main()
 			{
 			case ALLEGRO_KEY_RIGHT:
 				tiros[DIREITA] = true;
-				AtiraBalas(balas_d, NUM_BALAS_D, x, y, tiros);
+				AtiraBalas(balas_d, NUM_BALAS_D, atirador, NUM_ATIRADOR, x, y, tiros, "personagem");
 				break;
 			case ALLEGRO_KEY_LEFT:
 				tiros[ESQUERDA] = true;
-				AtiraBalas(balas_e, NUM_BALAS_E, x, y, tiros);
+				AtiraBalas(balas_e, NUM_BALAS_E, atirador, NUM_ATIRADOR, x, y, tiros, "personagem");
 				break;
 			case ALLEGRO_KEY_DOWN:
 				tiros[BAIXO] = true;
-				AtiraBalas(balas_b, NUM_BALAS_B, x, y, tiros);
+				AtiraBalas(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR, x, y, tiros, "personagem");
 				break;
 			case ALLEGRO_KEY_UP:
 				tiros[CIMA] = true;
-				AtiraBalas(balas_c, NUM_BALAS_C, x, y, tiros);
+				AtiraBalas(balas_c, NUM_BALAS_C, atirador, NUM_ATIRADOR, x, y, tiros, "personagem");
 				break;
 			}
 		}
@@ -157,19 +157,19 @@ int main()
 		else if (events.type == ALLEGRO_EVENT_TIMER)
 		{
 			active = true;
-			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw);
+			move_personagem(player, keyState, ScreenHeight, ScreenWidht, &x, &y, &dir, &moveSpeed, &active, &sourceX, &sourceY, &draw /*atirador, borda_x, borda_y, NUM_ATIRADOR*/);
 	
 			if (tiros[DIREITA])
-				AtualizarBalasDireita(balas_d, NUM_BALAS_D, tiros);
+				AtualizaBalas(balas_d, NUM_BALAS_D, 2);
 			if (tiros[ESQUERDA])
-				AtualizarBalasEsquerda(balas_e, NUM_BALAS_E, tiros);
+				AtualizaBalas(balas_e, NUM_BALAS_E, 1);
 			if (tiros[BAIXO])
-				AtualizarBalasBaixo(balas_b, NUM_BALAS_B, tiros);
+				AtualizaBalas(balas_b, NUM_BALAS_B, 4);
 			if (tiros[CIMA])
-				AtualizarBalasCima(balas_c, NUM_BALAS_C, tiros);
+				AtualizaBalas(balas_c, NUM_BALAS_C, 3);
 
-			AtiraBalas(balas, NUM_BALASATIRADOR, atirador, NUM_ATIRADOR);
-			AtualizaBalasAtirador(balas, NUM_BALASATIRADOR);
+			AtiraBalas(balas, NUM_BALASATIRADOR, atirador, NUM_ATIRADOR, x, y, tiros, "atirador");
+			AtualizaBalas(balas, NUM_BALASATIRADOR, 0);
 			LiberaTiros(atirador, NUM_ATIRADOR);
 			AtualizaAtirador(atirador, ScreenHeight, ScreenWidht, NUM_ATIRADOR);
 			
