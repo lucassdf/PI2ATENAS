@@ -15,6 +15,8 @@
 #include "projeteis.h"
 using namespace std;
 
+
+
 // -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
 const int NUM_BALAS_C = 4;
 const int NUM_BALAS_B = 4;
