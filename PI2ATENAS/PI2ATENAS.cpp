@@ -13,6 +13,7 @@
 #include <string>
 #include "movimentacoes.h"
 #include "projeteis.h"
+#include "bombas.h"
 #include <sstream>
 using namespace std;
 
@@ -26,12 +27,22 @@ const int NUM_BALAS_D = 10;
 const int NUM_ATIRADOR = 10;
 const int NUM_BALASATIRADOR = 5;
 const int NUM_PERSONAGEM = 1;
+const int NUM_BOMBAS = 3;
+
+ALLEGRO_TIMER* timerbomb = NULL;
+
+void InitBomb(Bombas bombas[], int NUM_BOMBAS);
+void DropBomb(Bombas bombas[], int NUM_BOMBAS, int x, int y);
+void ExplodeBomb(Bombas bombas[], int NUM_BOMBAS, int x, int y, ALLEGRO_TIMER* timerbomb);
+void DesenhaBomb(Bombas bombas[], int NUM_BOMBAS, int x, int y);
 
 // ---------- PROTÓTIPOS -------------
 Projeteis balas_c[NUM_BALAS_C];
 Projeteis balas_b[NUM_BALAS_B];
 Projeteis balas_e[NUM_BALAS_E];
 Projeteis balas_d[NUM_BALAS_D];
+
+Bombas bombas[NUM_BOMBAS];
 //DEFINICAO DO FPS
 const float FPS = 60.0;
 //ALTURA E LARGURA DA TELA
@@ -74,6 +85,8 @@ int main()
 	Projeteis balas_d[NUM_BALAS_D];
 	Atirador atirador[NUM_ATIRADOR];
 	Projeteis balas[NUM_BALASATIRADOR];
+	Bombas bombas[NUM_BOMBAS];
+
 
 
 
@@ -85,6 +98,7 @@ int main()
 	InitBalas(balas_d, NUM_BALAS_D, "personagem");
 	InitAtirador(atirador, NUM_ATIRADOR-7, "atirador", 1, 0.5);
 	InitBalas(balas, NUM_BALASATIRADOR, "atirador");
+	InitBomb(bombas, NUM_BOMBAS);
 
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
 	al_install_keyboard();
@@ -96,6 +110,7 @@ int main()
 	al_init_acodec_addon();
 	al_init_primitives_addon();
 	al_reserve_samples(10);
+	timerbomb = al_create_timer(3.00);
 
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 14, NULL);
@@ -112,18 +127,36 @@ int main()
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
+
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+
 	ALLEGRO_SAMPLE* trilha_sonora = NULL;
 	ALLEGRO_SAMPLE* projeteis_lancados = NULL;
+
 	ALLEGRO_SAMPLE_INSTANCE* inst_projeteis_lancados = NULL;
 	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
+
 	trilha_sonora = al_load_sample("trilha_sonora.ogg");
 	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
+
 	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
 	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
-	al_set_sample_instance_gain(inst_trilha_sonora, 0.8);
+	al_set_sample_instance_gain(inst_trilha_sonora, 0.3);
+
+	//---------------- EFEITO SONORO PROJETIL ------------------
+	ALLEGRO_SAMPLE* sound_projetil = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_sound_projetil = NULL;
+
+	sound_projetil = al_load_sample("sound_bullet.ogg");
+
+	inst_sound_projetil = al_create_sample_instance(sound_projetil);
+
+	al_attach_sample_instance_to_mixer(inst_sound_projetil, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_sound_projetil, ALLEGRO_PLAYMODE_BIDIR);
+	al_set_sample_instance_gain(inst_sound_projetil, 1);
 
 
 	
@@ -153,21 +186,33 @@ int main()
 			case ALLEGRO_KEY_RIGHT:
 				tiros[DIREITA] = true;
 				AtiraBalas(balas_d, NUM_BALAS_D, personagem, NUM_ATIRADOR, tiros, "personagem", 2);
+				al_stop_sample_instance(inst_sound_projetil);
+				al_play_sample_instance(inst_sound_projetil);
 				break;
 			case ALLEGRO_KEY_LEFT:
 				tiros[ESQUERDA] = true;
 				AtiraBalas(balas_e, NUM_BALAS_E, personagem, NUM_ATIRADOR, tiros, "personagem", 1);
+				al_stop_sample_instance(inst_sound_projetil);
+				al_play_sample_instance(inst_sound_projetil);
 				break;
 			case ALLEGRO_KEY_DOWN:
 				tiros[BAIXO] = true;
 				AtiraBalas(balas_b, NUM_BALAS_B, personagem, NUM_ATIRADOR, tiros, "personagem", 4);
+				al_stop_sample_instance(inst_sound_projetil);
+				al_play_sample_instance(inst_sound_projetil);
 				break;
 			case ALLEGRO_KEY_UP:
 				tiros[CIMA] = true;
 				AtiraBalas(balas_c, NUM_BALAS_C, personagem, NUM_ATIRADOR, tiros, "personagem", 3);
+				al_stop_sample_instance(inst_sound_projetil);
+				al_play_sample_instance(inst_sound_projetil);
 				break;
 			case ALLEGRO_KEY_ENTER:
 				tiros[ENTER] = true;
+				break;
+			case ALLEGRO_KEY_E:
+				bombas[2].ativo = true;
+				DropBomb(bombas, NUM_BOMBAS, x, y);
 				break;
 			}
 		}
@@ -196,6 +241,8 @@ int main()
 					move_personagem(keyState, personagem, NUM_PERSONAGEM, altura, largura, &draw);
 					LiberaTiros(personagem, NUM_ATIRADOR, "personagem");
 					AtualizaAtirador(atirador, altura, largura, NUM_ATIRADOR);
+					ExplodeBomb(bombas, NUM_BOMBAS, x, y, timerbomb);
+					DropBomb(bombas, NUM_BOMBAS, x, y);
 
 					BalaColidida(balas, NUM_BALASATIRADOR, personagem, NUM_PERSONAGEM, "atirador", &pontos);
 					BalaColidida(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR, "personagem", &pontos);
@@ -211,6 +258,7 @@ int main()
 		{
 			if (!gameover && !proximafase)
 			{
+				DesenhaBomb(bombas, NUM_BOMBAS, x, y);
 				DesenhaBalas(balas_c, NUM_BALAS_C, 5, 0, 0, 0);
 				DesenhaBalas(balas_b, NUM_BALAS_B, 5, 0, 0, 0);
 				DesenhaBalas(balas_e, NUM_BALAS_E, 5, 0, 0, 0);
@@ -331,6 +379,47 @@ int main()
 
 }
 
+void InitBomb(Bombas bombas[], int NUM_BOMBAS) {
+
+	for (int i = NUM_BOMBAS; i > 0; i--)
+	{
+		bombas[i].ID = BOMBA;
+		bombas[i].ativo = false;
+	}
+}
+
+void DropBomb(Bombas bomba[], int NUM_BOMBAS, int x, int y) {
+	for (int i = NUM_BOMBAS; i > 0; i--) {
+		if (bombas[2].ativo) {
+			bombas[2].x = x;
+			bombas[2].y = y;
+		}
+	}
+
+}
+
+void ExplodeBomb(Bombas bombas[], int NUM_BOMBAS, int x, int y, ALLEGRO_TIMER* timerbomb) {
+	for (int i = NUM_BOMBAS; i > 0; i--) {
+		if (bombas[i].ativo) {
+			if (timerbomb > 0) {
+				bombas[2].ativo = false;
+
+			}
+		}
+	}
+}
+
+void DesenhaBomb(Bombas bombas[], int NUM_BOMBAS, int x, int y) {
+	for (int i = NUM_BOMBAS; i > 0; i--) {
+		if (bombas[i].ativo)
+		{
+			al_draw_filled_circle(x, y, 5, al_map_rgb(255, 0, 233));
+		}
+	}
+	if (timerbomb == 0) {
+		al_draw_filled_circle(bombas[2].x, bombas[2].y, 5, al_map_rgb(0, 0, 0));
+	}
+}
 
 /*
 

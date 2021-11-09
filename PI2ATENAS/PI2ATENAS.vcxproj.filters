@@ -6,6 +6,7 @@
   <ItemGroup>
     <ClInclude Include="movimentacoes.h" />
     <ClInclude Include="projeteis.h" />
+    <ClInclude Include="Bombas.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

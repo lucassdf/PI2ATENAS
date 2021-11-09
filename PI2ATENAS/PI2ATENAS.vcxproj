@@ -178,6 +178,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bombas.h" />
     <ClInclude Include="movimentacoes.h" />
     <ClInclude Include="projeteis.h" />
   </ItemGroup>
