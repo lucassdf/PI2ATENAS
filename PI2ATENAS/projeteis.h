@@ -1,5 +1,4 @@
-﻿// ------ ARQUIVO OBJETOS -------
-#include <string>
+﻿#include <string>
 
 enum IDS { JOGADOR, PROJETIL, INIMIGOS, PROJETEISATIRADOR};
 enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
@@ -206,7 +205,7 @@ void AtualizaAtirador(Atirador atirador[], float  alt, float larg, int tamanho)
 
 	}
 }
-void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int tamanho, string tipo)
+void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int tamanho, string tipo)
 {
 
 	//ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
@@ -216,8 +215,8 @@ void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int ta
 		{
 			if (atirador[i].ativo)
 			{
-				//al_draw_bitmap(enemy, atirador[i].x, atirador[i].y, NULL);
-				al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgb(0, 128, 0));
+				al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgba(0, 0, 0, 0));
+				al_draw_bitmap(enemy, atirador[i].x - 33, atirador[i].y - 33, NULL);
 			}
 		}
 	}
@@ -227,7 +226,6 @@ void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int ta
 		{
 			if (atirador[i].ativo)
 			{
-				cout << index << endl;
 				//al_draw_bitmap(enemy, atirador[i].x, atirador[i].y, NULL);
 				al_draw_filled_circle(atirador[i].x+16, atirador[i].y+16, 16, al_map_rgba(0, 0, 0, 0));
 				al_draw_bitmap(playerWalk[index], atirador[i].x, atirador[i].y, NULL);
@@ -420,26 +418,3 @@ void DesenhaBalas(Projeteis balas[], int tamanho, int raio, int rgb1, int rgb2, 
 		}
 	}
 }
-
-
-
-
-
-//void ColisaoPersonagem(Atirador atirador, int tamanho_a,;
-// ------------- PROJETEIS ----------------
-/*int ColisaoPersonagem(Atirador atirador, int tamanho_a, int x, int y, int borda_x, int borda_y)
-{
-	for (int i = 0; i < tamanho_a; i++)
-	{
-		if (atirador[i].ativo)
-		{
-			if ((atirador[i].x - atirador[i].borda_x) < (x + borda_x) &&
-				(atirador[i].x + atirador[i].borda_x) > (x - borda_x) &&
-				(atirador[i].y - atirador[i].borda_y) < (y + borda_y) &&
-				(atirador[i].y + atirador[i].borda_y) > (y - borda_y))
-				return 0;
-		}
-	}
-
-
-}*/
