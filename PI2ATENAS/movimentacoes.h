@@ -3,23 +3,18 @@
 #include <string>
 using namespace std;
 
-
-void move_personagem(ALLEGRO_BITMAP* player, ALLEGRO_KEYBOARD_STATE keyState, int alt, int larg, int *x, int *y, int *dir, int *moveSpeed, bool *active, int *sourceX, int *sourceY, bool *draw /*Atirador atirador[], int borda_x, int borda_y, int tamanho_a*/) 
+/*
+void move_personagem(ALLEGRO_BITMAP* player, ALLEGRO_KEYBOARD_STATE keyState, Atirador atirador[], int alt, int larg, int *sourceX, int *sourceY, bool *draw)
 {
 
 	enum Direction { DOWN, LEFT, RIGHT, UP };
 	//LOGICA DE MOVIMENTACAO DO PERSONAGEM
 
-	/*for (int i = 0; i < tamanho_a; i++)
+	for (int i = 0; i < tamanho_a; i++)
 	{
-		if ((atirador[i].x - atirador[i].borda_x) < (*x + borda_x) &&
-			(atirador[i].x + atirador[i].borda_x) > (*x - borda_x) &&
-			(atirador[i].y - atirador[i].borda_y) < (*y + borda_y) &&
-			(atirador[i].y + atirador[i].borda_y) > (*y - borda_y))
-		{*/
 			if (al_key_down(&keyState, ALLEGRO_KEY_S) && *y < alt - 30)
 			{
-				*y += *moveSpeed;
+				*y += *atirador[i].velocidade;
 				*dir = DOWN;
 				//cout << "(" << x << "," << y << ")" << endl;
 				//cout << " , ";
@@ -68,3 +63,4 @@ void move_personagem(ALLEGRO_BITMAP* player, ALLEGRO_KEYBOARD_STATE keyState, in
 
 
 }
+*/
