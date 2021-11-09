@@ -244,13 +244,15 @@ int main()
 			else
 			{
 				if(gameover)
-					al_draw_textf(font, al_map_rgb(255, 255, 255),largura/2, altura/2, ALLEGRO_ALIGN_CENTRE, "Fim de jogo. Tecle enter para recomecar.");
+					al_draw_textf(font, al_map_rgb(255, 255, 255),largura/2, altura/2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
 				if(proximafase)
 					al_draw_textf(font, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "Voce derrotou todos os inimigos. Tecle enter para continuar para a proxima fase.");
 				if (tiros[ENTER])
 				{
 					if (gameover)
 					{
+						done = true;
+						/*
 						fase = 1;
 						mapa = al_load_bitmap("mapa.png");
 						enemy = al_load_bitmap("trash.png");
@@ -263,7 +265,7 @@ int main()
 						InitBalas(balas, NUM_BALASATIRADOR, "atirador");
 						gameover = false;
 						tiros[ENTER] = false;
-						pontos = 0;
+						pontos = 0;*/
 					}
 					if (proximafase && fase == 1)
 					{
@@ -274,7 +276,7 @@ int main()
 						InitBalas(balas_b, NUM_BALAS_B, "personagem");
 						InitBalas(balas_e, NUM_BALAS_E, "personagem");
 						InitBalas(balas_d, NUM_BALAS_D, "personagem");
-						InitAtirador(atirador, NUM_ATIRADOR-5, "atirador", 3, 1.0);
+						InitAtirador(atirador, NUM_ATIRADOR-5, "atirador", 3, 1.5);
 						InitBalas(balas, NUM_BALASATIRADOR, "atirador");
 						proximafase = false;
 						tiros[ENTER] = false;
@@ -288,7 +290,7 @@ int main()
 						InitBalas(balas_b, NUM_BALAS_B, "personagem");
 						InitBalas(balas_e, NUM_BALAS_E, "personagem");
 						InitBalas(balas_d, NUM_BALAS_D, "personagem");
-						InitAtirador(atirador, NUM_ATIRADOR-2, "atirador", 3, 1.0);
+						InitAtirador(atirador, NUM_ATIRADOR-2, "atirador", 3, 2.0);
 						InitBalas(balas, NUM_BALASATIRADOR, "atirador");
 						proximafase = false;
 						tiros[ENTER] = false;
