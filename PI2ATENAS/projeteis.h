@@ -4,6 +4,7 @@ enum IDS { JOGADOR, PROJETIL, INIMIGOS, PROJETEISATIRADOR};
 enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
 enum Direction {DOWN = 0, LEFT = 3, RIGHT=6, UP=9};
 int index = 0;
+int index2 = 0;
 int prevDir = 0;
 
 struct Projeteis
@@ -120,8 +121,8 @@ void InitAtirador(Atirador atirador[], int tamanho, string tipo, int vida, float
 		{
 			atirador[i].ID = JOGADOR;
 			atirador[i].velocidade = velocidade;
-			atirador[i].borda_x = 16;
-			atirador[i].borda_y = 16;
+			atirador[i].borda_x = 20;
+			atirador[i].borda_y = 20;
 			atirador[i].vida = vida;
 			atirador[i].pontos = 0;
 			atirador[i].x = 50;
@@ -226,7 +227,7 @@ void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atir
 			if (atirador[i].ativo)
 			{
 				//al_draw_bitmap(enemy, atirador[i].x, atirador[i].y, NULL);
-				al_draw_filled_circle(atirador[i].x+16, atirador[i].y+16, 16, al_map_rgba(0, 0, 0, 0));
+				al_draw_filled_circle(atirador[i].x+20, atirador[i].y+20, 16, al_map_rgb(0, 0, 0));
 				al_draw_bitmap(playerWalk[index], atirador[i].x, atirador[i].y, NULL);
 				al_convert_mask_to_alpha(playerWalk[index], al_map_rgb(0, 0, 0));
 				//al_draw_filled_rectangle(atirador[i].x, atirador[i].y, atirador[i].x+32, atirador[i].y+32, al_map_rgb(0, 128, 0));
@@ -244,8 +245,8 @@ void LiberaTiros(Atirador atirador[], int tamanho, string tipo)
 		{
 			if (!atirador[i].ativo && atirador[i].vida > 0)
 			{
-				atirador[i].x = rand() % 400 + 30;
-				atirador[i].y = rand() % 400 + 30;
+				atirador[i].x = rand() % 580 + 60;
+				atirador[i].y = rand() % 420 + 60;
 				atirador[i].ativo = true;
 
 				/*if (rand() % 500 == 0)
@@ -397,7 +398,7 @@ void AtualizaBalas(Projeteis balas[], int tamanho_b, Atirador atirador[], int c_
 					else if (balas[i].dir == 4)
 						balas[i].y += balas[i].velocidade;
 
-					if (balas[i].x < 20 || balas[i].x > larg || balas[i].y < 20 || balas[i].y > alt || !atirador[j].ativo)
+					if (balas[i].x < 10 || balas[i].x > larg || balas[i].y < 60 || balas[i].y > alt || !atirador[j].ativo)
 					{
 						balas[i].ativo = false;
 					}

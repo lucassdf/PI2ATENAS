@@ -48,7 +48,7 @@ int main()
 
 	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN = 0, LEFT = 3, RIGHT = 6, UP = 9};
-	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA, ENTER};
+	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA, ENTER, UM, DOIS, TRES};
 
 	//INICIALIZACAO DA TELA
 	if (!al_init())
@@ -63,11 +63,11 @@ int main()
 	al_set_window_position(display, 200, 200);
 
 	//VARIAVEIS DE SUPORTE
-	bool done = false, draw = true, active = false, gameover = false, proximafase = false, iniciar = false;
+	bool done = false, draw = true, active = false, gameover = false, proximafase = false, iniciar = false, respondido[3] = { false, false, false };
 	int x = 10, y = 10, moveSpeed = 5, pontos = 0, contador = 0;
 	int x2 = 200, y2 = 200, borda_x = 16, borda_y=16, borda_x2=16, borda_y2=16;
 	int dir = DOWN, dir2 = 1, dir3 = 0, prevDir = 0, fase = 1;
-	bool tiros[] = {false, false, false, false, false};
+	bool tiros[] = {false, false, false, false, false, false, false, false};
 	
 	// ------------ INICIALIZA��O DE OBJETOS --------------
 	Atirador personagem[NUM_PERSONAGEM];
@@ -110,13 +110,17 @@ int main()
 		str << "sprites/" << i + 1 << ".png";
 		playerWalk[i] = al_load_bitmap(str.str().c_str());
 	}
-	
-	ALLEGRO_BITMAP* mapa = al_load_bitmap("mapas/mapa1.png");;
-	ALLEGRO_BITMAP* imagem1 = al_load_bitmap("imagens/inicio.png");;
 
+	ALLEGRO_BITMAP* mapa = al_load_bitmap("mapas/mapa1.png");
+	ALLEGRO_BITMAP* imagem1 = al_load_bitmap("imagens/inicio.png");
+	ALLEGRO_BITMAP* imagem2 = al_load_bitmap("imagens/historia.png");
+	ALLEGRO_BITMAP* pergunta = al_load_bitmap("imagens/pergunta1.png");
+	ALLEGRO_BITMAP* pergunta2 = al_load_bitmap("imagens/pergunta2.png");
+	ALLEGRO_BITMAP* pergunta3 = al_load_bitmap("imagens/pergunta3.png");
 	ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
+	ALLEGRO_TIMER* timer2 = al_create_timer(1);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
@@ -154,14 +158,14 @@ int main()
 	//LOOP CONTENDO A LOGICA DO JOGO
 	srand(time(NULL));
 	al_start_timer(timer);
-
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(imagem1, 0, 0, NULL);
-	//al_draw_textf(font, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "Bem vindo. Tecle ENTER para jogar");
 	al_flip_display();
 
 	while (!done)
 	{
+		int a = al_get_timer_count(timer2);
+		cout << a << endl;
 		ALLEGRO_EVENT events;
 		al_wait_for_event(event_queue, &events);
 		al_get_keyboard_state(&keyState);
@@ -202,6 +206,15 @@ int main()
 				break;
 			case ALLEGRO_KEY_ENTER:
 				tiros[ENTER] = true;
+				break;
+			case ALLEGRO_KEY_1:
+				tiros[UM] = true;
+				break;
+			case ALLEGRO_KEY_2:
+				tiros[DOIS] = true;
+				break;
+			case ALLEGRO_KEY_3:
+				tiros[TRES] = true;
 				break;
 			}
 		}
@@ -244,7 +257,21 @@ int main()
 		{	
 			if (tiros[ENTER])
 			{
-				iniciar = true;
+				al_start_timer(timer2);
+				if(a < 5)
+				{
+					al_clear_to_color(al_map_rgb(0, 0, 0));
+					al_draw_bitmap(imagem2, 0, 0, NULL);
+					al_flip_display();
+				}
+				/*if (a > 5 && a < 10)
+				{
+					al_clear_to_color(al_map_rgb(0, 0, 0));
+					al_draw_bitmap(imagem1, 0, 0, NULL);
+					al_flip_display();
+				}*/
+				if(a > 5)
+					iniciar = true;
 			}
 
 			if (iniciar)
@@ -286,9 +313,87 @@ int main()
 				else
 				{
 					if (gameover)
+					{ 
 						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
-					if (proximafase)
-						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "Voce derrotou todos os inimigos. Tecle enter para continuar para a proxima fase.");
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, 260, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
+					}
+					if (proximafase && fase == 1)
+					{
+						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_draw_bitmap(pergunta, 65, 180, NULL);
+						al_flip_display();
+						if (tiros[UM] && !respondido[0])
+						{
+							tiros[UM] = false;
+							respondido[0] = true;
+							personagem->vida++;
+							pergunta = al_load_bitmap("imagens/pergunta1-resp.png");
+						}
+						if (tiros[DOIS] && !respondido[0])
+						{
+							tiros[DOIS] = false;
+							respondido[0] = true;
+							pergunta = al_load_bitmap("imagens/pergunta1-errada1.png");
+						}
+						if (tiros[TRES] && !respondido[0])
+						{
+							tiros[TRES] = false;
+							respondido[0] = true;
+							pergunta = al_load_bitmap("imagens/pergunta1-errada2.png");
+						}
+						
+					}
+					if (proximafase && fase == 2)
+					{
+						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_draw_bitmap(pergunta2, 65, 180, NULL);
+						al_flip_display();
+						if (tiros[UM] && !respondido[1])
+						{
+							tiros[UM] = false;
+							respondido[1] = true;
+							personagem->vida++;
+							pergunta2 = al_load_bitmap("imagens/pergunta2-resp.png");
+						}
+						if (tiros[DOIS] && !respondido[1])
+						{
+							tiros[DOIS] = false;
+							respondido[1] = true;
+							pergunta2 = al_load_bitmap("imagens/pergunta2-errada1.png");
+						}
+						if (tiros[TRES] && !respondido[1])
+						{
+							tiros[TRES] = false;
+							respondido[1] = true;
+							pergunta2 = al_load_bitmap("imagens/pergunta2-errada2.png");
+						}
+					}
+					if (proximafase && fase == 3)
+					{
+						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_draw_bitmap(pergunta3, 65, 180, NULL);
+						al_flip_display();
+						if (tiros[UM] && !respondido[2])
+						{
+							tiros[UM] = false;
+							respondido[2] = true;
+							personagem->vida++;
+							pergunta3 = al_load_bitmap("imagens/pergunta3-resp.png");
+						}
+						if (tiros[DOIS] && !respondido[2])
+						{
+							tiros[DOIS] = false;
+							respondido[2] = true;
+							pergunta3 = al_load_bitmap("imagens/pergunta3-errada1.png");
+						}
+						if (tiros[TRES] && !respondido[2])
+						{
+							tiros[TRES] = false;
+							respondido[2] = true;
+							pergunta3 = al_load_bitmap("imagens/pergunta3-errada2.png");
+						}
+
+					}
 					if (tiros[ENTER])
 					{
 						if (gameover)
