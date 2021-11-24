@@ -48,7 +48,7 @@ int main()
 
 	//DEFINICAO DAS TECLAS DE DIRECAO
 	enum Direction { DOWN = 0, LEFT = 3, RIGHT = 6, UP = 9};
-	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA, ENTER, UM, DOIS, TRES};
+	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA, ENTER, UM, DOIS, TRES, F1, F2, F3, F4};
 
 	//INICIALIZACAO DA TELA
 	if (!al_init())
@@ -63,11 +63,10 @@ int main()
 	al_set_window_position(display, 200, 200);
 
 	//VARIAVEIS DE SUPORTE
-	bool done = false, draw = true, active = false, gameover = false, proximafase = false, iniciar = false, respondido[3] = { false, false, false };
-	int x = 10, y = 10, moveSpeed = 5, pontos = 0, contador = 0;
-	int x2 = 200, y2 = 200, borda_x = 16, borda_y=16, borda_x2=16, borda_y2=16;
+	bool done = false, draw = true, active = false, gameover = false, proximafase = false, iniciar = false, fimdejogo = false, respondido[3] = { false, false, false }, vermelho = false, verde = false, azul = false, amarelo = false;
+	int x = 10, y = 10, moveSpeed = 5, pontos = 0, contador = 0, r = 255, g = 255, b = 255, corBala = 0, corAtirador = 4;
 	int dir = DOWN, dir2 = 1, dir3 = 0, prevDir = 0, fase = 1;
-	bool tiros[] = {false, false, false, false, false, false, false, false};
+	bool tiros[] = {false, false, false, false, false, false, false, false, false, false, false, false};
 	
 	// ------------ INICIALIZA��O DE OBJETOS --------------
 	Atirador personagem[NUM_PERSONAGEM];
@@ -80,13 +79,13 @@ int main()
 
 
 	// -------- FUN��ES INICIAIS ---------------
-	InitAtirador(personagem, NUM_PERSONAGEM, "personagem", 5, 5.0);
-	InitBalas(balas_c, NUM_BALAS_C, "personagem", 10);
-	InitBalas(balas_b, NUM_BALAS_B, "personagem", 10);
-	InitBalas(balas_e, NUM_BALAS_E, "personagem", 10);
-	InitBalas(balas_d, NUM_BALAS_D, "personagem", 10);
-	InitAtirador(atirador, NUM_ATIRADOR-7, "atirador", 1, 0.5);
-	InitBalas(balas, NUM_BALASATIRADOR, "atirador", 2);
+	InitAtirador(personagem, NUM_PERSONAGEM, "personagem", 5, 5.0, 0);
+	InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+	InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+	InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+	InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+	InitAtirador(atirador, NUM_ATIRADOR-9, "atirador", 1, 0, corAtirador);
+	InitBalas(balas, NUM_BALASATIRADOR, "atirador", 1, corBala);
 
 	
 	//INICIALIZACAO DOS ADDONS DO ALLEGRO
@@ -101,8 +100,8 @@ int main()
 	al_reserve_samples(10);
 
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
-	ALLEGRO_FONT* font = al_load_font("fast99.ttf", 30, NULL);
-	ALLEGRO_FONT* font2 = al_load_font("fast99.ttf", 14, NULL);
+	ALLEGRO_FONT* font = al_load_font("fontes/Minecraft.ttf", 25, NULL);
+	ALLEGRO_FONT* font2 = al_load_font("fontes/Minecraft.ttf", 14, NULL);
 	ALLEGRO_BITMAP* playerWalk[12];
 	for (int i = 0; i < 12; i++)
 	{
@@ -114,6 +113,8 @@ int main()
 	ALLEGRO_BITMAP* mapa = al_load_bitmap("mapas/mapa1.png");
 	ALLEGRO_BITMAP* imagem1 = al_load_bitmap("imagens/inicio.png");
 	ALLEGRO_BITMAP* imagem2 = al_load_bitmap("imagens/historia.png");
+	ALLEGRO_BITMAP* imagem3 = al_load_bitmap("imagens/gameover.png");
+	ALLEGRO_BITMAP* imagem4 = al_load_bitmap("imagens/comandos.png");
 	ALLEGRO_BITMAP* pergunta = al_load_bitmap("imagens/pergunta1.png");
 	ALLEGRO_BITMAP* pergunta2 = al_load_bitmap("imagens/pergunta2.png");
 	ALLEGRO_BITMAP* pergunta3 = al_load_bitmap("imagens/pergunta3.png");
@@ -216,6 +217,38 @@ int main()
 			case ALLEGRO_KEY_3:
 				tiros[TRES] = true;
 				break;
+			case ALLEGRO_KEY_F1:
+				tiros[F1] = true;
+				r = 0;
+				g = 128;
+				b = 0;
+				verde = true;
+				corBala = 1;
+				break;
+			case ALLEGRO_KEY_F2:
+				tiros[F2] = true;
+				r = 255;
+				g = 0;
+				b = 0;
+				vermelho = true;
+				corBala = 2;
+				break;
+			case ALLEGRO_KEY_F3:
+				tiros[F3] = true;
+				r = 255;
+				g = 255;
+				b = 0;
+				amarelo = true;
+				corBala = 3;
+				break;
+			case ALLEGRO_KEY_F4:
+				tiros[F4] = true;
+				r = 0;
+				g = 0;
+				b = 255;
+				azul = true;
+				corBala = 4;
+				break;
 			}
 		}
 
@@ -243,11 +276,11 @@ int main()
 					LiberaTiros(personagem, NUM_ATIRADOR, "personagem");
 					AtualizaAtirador(atirador, altura, largura, NUM_ATIRADOR);
 
-					BalaColidida(balas, NUM_BALASATIRADOR, personagem, NUM_PERSONAGEM, "atirador", &pontos);
-					BalaColidida(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR, "personagem", &pontos);
-					BalaColidida(balas_c, NUM_BALAS_C, atirador, NUM_ATIRADOR, "personagem", &pontos);
-					BalaColidida(balas_d, NUM_BALAS_D, atirador, NUM_ATIRADOR, "personagem", &pontos);
-					BalaColidida(balas_e, NUM_BALAS_E, atirador, NUM_ATIRADOR, "personagem", &pontos);
+					BalaColidida(balas, NUM_BALASATIRADOR, personagem, NUM_PERSONAGEM, "atirador", &pontos, corBala, corAtirador);
+					BalaColidida(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
+					BalaColidida(balas_c, NUM_BALAS_C, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
+					BalaColidida(balas_d, NUM_BALAS_D, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
+					BalaColidida(balas_e, NUM_BALAS_E, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
 					
 				}
 				
@@ -264,13 +297,13 @@ int main()
 					al_draw_bitmap(imagem2, 0, 0, NULL);
 					al_flip_display();
 				}
-				/*if (a > 5 && a < 10)
+				if (a > 5 && a < 10)
 				{
 					al_clear_to_color(al_map_rgb(0, 0, 0));
-					al_draw_bitmap(imagem1, 0, 0, NULL);
+					al_draw_bitmap(imagem4, 0, 0, NULL);
 					al_flip_display();
-				}*/
-				if(a > 5)
+				}
+				if(a > 10)
 					iniciar = true;
 			}
 
@@ -280,25 +313,26 @@ int main()
 
 				if (!gameover && !proximafase)
 				{
-					DesenhaBalas(balas_c, NUM_BALAS_C, 5, 0, 0, 0);
-					DesenhaBalas(balas_b, NUM_BALAS_B, 5, 0, 0, 0);
-					DesenhaBalas(balas_e, NUM_BALAS_E, 5, 0, 0, 0);
-					DesenhaBalas(balas_d, NUM_BALAS_D, 5, 0, 0, 0);
+					DesenhaBalas(balas_c, NUM_BALAS_C, 5, r, g, b);
+					DesenhaBalas(balas_b, NUM_BALAS_B, 5, r, g, b);
+					DesenhaBalas(balas_e, NUM_BALAS_E, 5, r, g, b);
+					DesenhaBalas(balas_d, NUM_BALAS_D, 5, r, g, b);
 					DesenhaAtirador(enemy, playerWalk, atirador, NUM_ATIRADOR, "atirador");
 					DesenhaBalas(balas, NUM_BALASATIRADOR, 8, 0, 128, 0);
 					DesenhaAtirador(enemy, playerWalk, personagem, NUM_PERSONAGEM, "personagem"); 
-					al_draw_textf(font, al_map_rgb(255, 255, 255), 150, 12, NULL, "%d", personagem->vida);
-					al_draw_textf(font, al_map_rgb(255, 255, 255), 360, 12, NULL, "%d", fase);
-					al_draw_textf(font, al_map_rgb(255, 255, 255), 540, 12, NULL, "%d", pontos);
+					al_draw_textf(font, al_map_rgb(255, 255, 255), 200, 15, NULL, "%d", personagem->vida);
+					al_draw_filled_circle(250, 20, 10, al_map_rgb(r, g, b));
+					al_draw_textf(font, al_map_rgb(255, 255, 255), 360, 15, NULL, "%d", fase);
+					al_draw_textf(font, al_map_rgb(255, 255, 255), 540, 15, NULL, "%d", pontos);
 					if (personagem->vida <= 0)
 						gameover = true;
 					contador = pontos;
-					if (contador == 3 && fase == 1)
+					if (contador == 1 && fase == 1)
 					{
 						proximafase = true;
 						contador = 0;
 					}
-					if (contador == 5 && fase == 2)
+					if (contador == 4 && fase == 2)
 					{
 						proximafase = true;
 						contador = 0;
@@ -308,14 +342,46 @@ int main()
 						proximafase = true;
 						contador = 0;
 					}
-
+					if (contador == 11 && fase == 4)
+					{
+						proximafase = true;
+						contador = 0;
+					}
+					if (contador == 15 && fase == 5)
+					{
+						proximafase = true;
+						contador = 0;
+					}
+					if (contador == 20 && fase == 6)
+					{
+						proximafase = true;
+						contador = 0;
+					}
+					if (contador == 24 && fase == 7)
+					{
+						proximafase = true;
+						contador = 0;
+					}
+					if (contador == 29 && fase == 8)
+					{
+						proximafase = true;
+						contador = 0;
+					}
+					if(contador == 30 && fase == 9)
+					{
+						fimdejogo = true;
+						contador = 0;
+					}
 				}
 				else
 				{
 					if (gameover)
 					{ 
-						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
-						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, 260, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
+						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_draw_bitmap(imagem3, 0, 0, NULL);
+						al_flip_display();
+						//al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, 360, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
 					}
 					if (proximafase && fase == 1)
 					{
@@ -416,43 +482,121 @@ int main()
 						}
 						if (proximafase && fase == 1)
 						{
+							corAtirador = 4;
 							fase++;
 							mapa = al_load_bitmap("mapas/mapa2.png");
 							enemy = al_load_bitmap("trash.png");
-							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10);
-							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10);
-							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10);
-							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10);
-							InitAtirador(atirador, NUM_ATIRADOR - 8, "atirador", 3, 1.5);
-							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 3);
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 7, "atirador", 2, 0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 2, 0);
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
 						if (proximafase && fase == 2)
 						{
+							corAtirador = 3;
 							fase++;
 							mapa = al_load_bitmap("mapas/mapa3.png");
 							enemy = al_load_bitmap("trash.png");
-							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10);
-							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10);
-							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10);
-							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10);
-							InitAtirador(atirador, NUM_ATIRADOR - 8, "atirador", 3, 2.0);
-							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 4);
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 7, "atirador", 2, 1.0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 2, 0);
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
 						if (proximafase && fase == 3)
 						{
+							corAtirador = 3;
+							fase++;
+							mapa = al_load_bitmap("mapas/mapa3.png");
+							enemy = al_load_bitmap("trash.png");
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 6, "atirador", 3, 1.0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 2, 0);
+							proximafase = false;
+							tiros[ENTER] = false;
+						}
+						if (proximafase && fase == 4)
+						{
+							corAtirador = 2;
+							fase++;
+							mapa = al_load_bitmap("mapas/mapa3.png");
+							enemy = al_load_bitmap("trash.png");
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 6, "atirador", 3, 1.5, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 3, 0);
+							proximafase = false;
+							tiros[ENTER] = false;
+						}
+						if (proximafase && fase == 5)
+						{
+							corAtirador = 2;
+							fase++;
+							mapa = al_load_bitmap("mapas/mapa3.png");
+							enemy = al_load_bitmap("trash.png");
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 5, "atirador", 3, 1.5, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 3, 0);
+							proximafase = false;
+							tiros[ENTER] = false;
+						}
+						if (proximafase && fase == 6)
+						{
+							corAtirador = 1;
+							fase++;
+							mapa = al_load_bitmap("mapas/mapa3.png");
+							enemy = al_load_bitmap("trash.png");
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 6, "atirador", 4, 2.0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 3, 0);
+							proximafase = false;
+							tiros[ENTER] = false;
+						}
+						if (proximafase && fase == 7)
+						{
+							corAtirador = 1;
+							fase++;
+							mapa = al_load_bitmap("mapas/mapa3.png");
+							enemy = al_load_bitmap("trash.png");
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 5, "atirador", 4, 2.0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 3, 0);
+							proximafase = false;
+							tiros[ENTER] = false;
+						}
+						if (proximafase && fase == 8)
+						{
+							corAtirador = 4;
 							fase++;
 							mapa = al_load_bitmap("mapas/mapa4.png");
 							enemy = al_load_bitmap("inimigos/boss1.png");
-							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10);
-							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10);
-							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10);
-							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10);
-							InitAtirador(atirador, NUM_ATIRADOR - 9, "atirador", 10, 3.0);
-							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 10);
+							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
+							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
+							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
+							InitBalas(balas_d, NUM_BALAS_D, "personagem", 10, corBala);
+							InitAtirador(atirador, NUM_ATIRADOR - 9, "atirador", 10, 3.0, corAtirador);
+							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 10, 0);
 							proximafase = false;
 							tiros[ENTER] = false;
 						}

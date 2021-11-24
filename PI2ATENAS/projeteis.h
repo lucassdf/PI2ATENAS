@@ -15,6 +15,7 @@ struct Projeteis
 	int velocidade;
 	int dir;
 	bool ativo;
+	int cor;
 };
 
 struct Atirador {
@@ -28,6 +29,7 @@ struct Atirador {
 	int vida;
 	int pontos;
 	bool ativo;
+	int cor;
 };
 
 // ---------- PROT�TIPOS -------------
@@ -38,7 +40,7 @@ void BalaColidida(Projeteis balas[], int b_tamanho, Atirador atirador[], int c_t
 void InitAtirador(Atirador atirador[], int tamanho, string tipo);
 void LiberaTiros(Atirador atirador[], int tamanho, string tipo);
 void AtualizaAtirador(Atirador atirador[], float  alt, float larg, int tamanho);
-void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade);
+void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade, int corBala);
 void AtualizaBalas(Projeteis balas[], int tamanho);
 void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk, Atirador atirador[], int tamanho, string tipo, int index);
 void move_personagem(ALLEGRO_KEYBOARD_STATE keyState, Atirador atirador[], int tamanho_a, int alt, int larg, bool* draw, int* prevDir, int index);
@@ -103,7 +105,7 @@ void move_personagem(ALLEGRO_KEYBOARD_STATE keyState, Atirador atirador[], int t
 			if (index >= atirador[i].dir + 3)
 				index = atirador[i].dir;
 
-			if (atirador[i].dir != 0)
+			if (atirador[i].dir != prevDir)
 				index = atirador[i].dir;
 
 			
@@ -113,7 +115,7 @@ void move_personagem(ALLEGRO_KEYBOARD_STATE keyState, Atirador atirador[], int t
 		
 	}
 }
-void InitAtirador(Atirador atirador[], int tamanho, string tipo, int vida, float velocidade)
+void InitAtirador(Atirador atirador[], int tamanho, string tipo, int vida, float velocidade, int corAtirador)
 {
 	if (tipo == "personagem")
 	{
@@ -142,6 +144,7 @@ void InitAtirador(Atirador atirador[], int tamanho, string tipo, int vida, float
 			atirador[i].vida = vida;
 			atirador[i].pontos = 0;
 			atirador[i].ativo = false;
+			atirador[i].cor = corAtirador;
 		}
 	}
 }
@@ -227,7 +230,7 @@ void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atir
 			if (atirador[i].ativo)
 			{
 				//al_draw_bitmap(enemy, atirador[i].x, atirador[i].y, NULL);
-				al_draw_filled_circle(atirador[i].x+20, atirador[i].y+20, 16, al_map_rgb(0, 0, 0));
+				al_draw_filled_circle(atirador[i].x+20, atirador[i].y+20, 16, al_map_rgba(0,0, 0, 0));
 				al_draw_bitmap(playerWalk[index], atirador[i].x, atirador[i].y, NULL);
 				al_convert_mask_to_alpha(playerWalk[index], al_map_rgb(0, 0, 0));
 				//al_draw_filled_rectangle(atirador[i].x, atirador[i].y, atirador[i].x+32, atirador[i].y+32, al_map_rgb(0, 128, 0));
@@ -283,39 +286,82 @@ void LiberaTiros(Atirador atirador[], int tamanho, string tipo)
 
 //------------------------------------------------------------------------------------------------------------------------------
 
-void BalaColidida(Projeteis balas[], int b_tamanho, Atirador atirador[], int c_tamanho, string tipo, int *pontos)
+void BalaColidida(Projeteis balas[], int b_tamanho, Atirador atirador[], int c_tamanho, string tipo, int *pontos, int corBala, int corAtirador)
 {
-	for (int i = 0; i < b_tamanho; i++)
+	if (tipo == "personagem" && corBala == corAtirador)
 	{
-		if (balas[i].ativo)
+		for (int i = 0; i < b_tamanho; i++)
 		{
-			for (int j = 0; j < c_tamanho; j++)
+			if (balas[i].ativo)
 			{
-				if (atirador[j].ativo)
+				for (int j = 0; j < c_tamanho; j++)
 				{
-					if (balas[i].x > (atirador[j].x - atirador[j].borda_x) &&
-						balas[i].x < (atirador[j].x + atirador[j].borda_x) &&
-						balas[i].y >(atirador[j].y - atirador[j].borda_y) &&
-						balas[i].y < (atirador[j].y + atirador[j].borda_y))
+					if (atirador[j].ativo)
 					{
-						balas[i].ativo = false;
-						--atirador[j].vida;
-						if (atirador[j].vida <= 0)
+						if (balas[i].x > (atirador[j].x - atirador[j].borda_x) &&
+							balas[i].x < (atirador[j].x + atirador[j].borda_x) &&
+							balas[i].y >(atirador[j].y - atirador[j].borda_y) &&
+							balas[i].y < (atirador[j].y + atirador[j].borda_y))
 						{
-							atirador[j].ativo = false;
-							++*pontos;
-							/*if (tipo == "atirador")
+							balas[i].ativo = false;
+							--atirador[j].vida;
+							if (atirador[j].vida <= 0)
 							{
-								al_show_native_message_box(display, "Error", "GAME OVER: VOCE MORREU", "JOGUE NOVAMENTE", NULL, NULL);
-								*done = true;
+								atirador[j].ativo = false;
+								++* pontos;
+								/*if (tipo == "atirador")
+								{
+									al_show_native_message_box(display, "Error", "GAME OVER: VOCE MORREU", "JOGUE NOVAMENTE", NULL, NULL);
+									*done = true;
+								}
+								if (tipo == "personagem" && j == c_tamanho)
+								{
+									al_show_native_message_box(display, "PARABÉNS", "VOCE DERROTOU TODOS OS INIMIGOS", "PODE PROSSEGUIR SUA JORNADA", NULL, NULL);
+									*done = true;
+								}*/
 							}
-							if (tipo == "personagem" && j == c_tamanho)
-							{	
-								al_show_native_message_box(display, "PARABÉNS", "VOCE DERROTOU TODOS OS INIMIGOS", "PODE PROSSEGUIR SUA JORNADA", NULL, NULL);
-								*done = true;
-							}*/
-						}
 
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (tipo == "atirador")
+	{
+		for (int i = 0; i < b_tamanho; i++)
+		{
+			if (balas[i].ativo)
+			{
+				for (int j = 0; j < c_tamanho; j++)
+				{
+					if (atirador[j].ativo)
+					{
+						if (balas[i].x > (atirador[j].x - atirador[j].borda_x) &&
+							balas[i].x < (atirador[j].x + atirador[j].borda_x) &&
+							balas[i].y >(atirador[j].y - atirador[j].borda_y) &&
+							balas[i].y < (atirador[j].y + atirador[j].borda_y))
+						{
+							balas[i].ativo = false;
+							--atirador[j].vida;
+							if (atirador[j].vida <= 0)
+							{
+								atirador[j].ativo = false;
+								++* pontos;
+								/*if (tipo == "atirador")
+								{
+									al_show_native_message_box(display, "Error", "GAME OVER: VOCE MORREU", "JOGUE NOVAMENTE", NULL, NULL);
+									*done = true;
+								}
+								if (tipo == "personagem" && j == c_tamanho)
+								{
+									al_show_native_message_box(display, "PARABÉNS", "VOCE DERROTOU TODOS OS INIMIGOS", "PODE PROSSEGUIR SUA JORNADA", NULL, NULL);
+									*done = true;
+								}*/
+							}
+
+						}
 					}
 				}
 			}
@@ -359,7 +405,7 @@ void AtiraBalas(Projeteis balas[], int tamanho, Atirador atirador[], int tamanho
 	}
 
 }
-void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade)
+void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade, int corBala)
 {
 	if (tipo == "atirador")
 	{
@@ -375,6 +421,7 @@ void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade)
 			balas[i].ID = PROJETIL;
 			balas[i].velocidade = velocidade;
 			balas[i].ativo = false;
+			balas[i].cor = corBala;
 		}
 	}
 }
