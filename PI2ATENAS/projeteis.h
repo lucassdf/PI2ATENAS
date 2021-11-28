@@ -1,4 +1,7 @@
 ﻿#include <string>
+#include <iostream>
+#include <cstdlib>
+using namespace std;
 
 enum IDS { JOGADOR, PROJETIL, INIMIGOS, PROJETEISATIRADOR};
 enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA };
@@ -37,7 +40,7 @@ struct Atirador {
 void AtiraBalas(Projeteis balas[], int tamanho, Atirador atirador[], int tamanho_a, bool tiros[], string tipo, int dir);
 void DesenhaBalas(Projeteis balas[], int tamanho, int raio, int rgb1, int rgb2, int rgb3);
 void BalaColidida(Projeteis balas[], int b_tamanho, Atirador atirador[], int c_tamanho, string tipo, int *pontos);
-void InitAtirador(Atirador atirador[], int tamanho, string tipo);
+void InitAtirador(Atirador atirador[], int tamanho, string tipo, int vida, float velocidade, int corAtirador);
 void LiberaTiros(Atirador atirador[], int tamanho, string tipo);
 void AtualizaAtirador(Atirador atirador[], float  alt, float larg, int tamanho);
 void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade, int corBala);
