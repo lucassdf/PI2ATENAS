@@ -175,8 +175,15 @@
     <ClCompile Include="PI2ATENAS.cpp" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ClInclude Include="Bombas.h" />
     <ClInclude Include="movimentacoes.h" />
+=======
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="imagens.h" />
+>>>>>>> 0e2d78cb2eb14b4921f439d669b4e6d0a9081155
     <ClInclude Include="projeteis.h" />
   </ItemGroup>
   <ItemGroup>

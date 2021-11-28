@@ -4,9 +4,8 @@
     <ClCompile Include="PI2ATENAS.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="movimentacoes.h" />
     <ClInclude Include="projeteis.h" />
-    <ClInclude Include="Bombas.h" />
+    <ClInclude Include="imagens.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
