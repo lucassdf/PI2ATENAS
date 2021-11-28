@@ -128,16 +128,50 @@ int main()
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_TIMER* timer2 = al_create_timer(1);
+	ALLEGRO_TIMER* timer3 = al_create_timer(1);
 	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 
-	ALLEGRO_SAMPLE* trilha_sonora = NULL;
-	ALLEGRO_SAMPLE* projeteis_lancados = NULL;
 
+	//---------------- TRILHA SONORA MENU ---------------------
+	ALLEGRO_SAMPLE* sound_menu = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_sound_menu = NULL;
+
+	sound_menu = al_load_sample("sound_menu.ogg");
+	inst_sound_menu = al_create_sample_instance(sound_menu);
+	al_play_sample_instance(inst_sound_menu);
+
+
+
+	al_attach_sample_instance_to_mixer(inst_sound_menu, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_sound_menu, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_sound_menu, 1);
+
+
+	//---------------- EFEITO SONORO PROJETIL ------------------
+
+	ALLEGRO_SAMPLE* projeteis_lancados = NULL;
 	ALLEGRO_SAMPLE_INSTANCE* inst_projeteis_lancados = NULL;
+	ALLEGRO_SAMPLE* sound_projetil = NULL;
+	ALLEGRO_SAMPLE_INSTANCE* inst_sound_projetil = NULL;
+
+
+	sound_projetil = al_load_sample("sound_bullet.ogg");
+	inst_sound_projetil = al_create_sample_instance(sound_projetil);
+	
+
+	al_attach_sample_instance_to_mixer(inst_sound_projetil, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_sound_projetil, ALLEGRO_PLAYMODE_BIDIR);
+	al_set_sample_instance_gain(inst_sound_projetil, 0.5);
+
+
+	//---------------- TRILHA SONORA ------------------
+	ALLEGRO_SAMPLE* trilha_sonora = NULL;
+
 	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
 
 	trilha_sonora = al_load_sample("trilha_sonora.ogg");
@@ -145,20 +179,100 @@ int main()
 
 	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
 	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
-	al_set_sample_instance_gain(inst_trilha_sonora, 0.3);
+	al_set_sample_instance_gain(inst_trilha_sonora, 0.9);
 
-	//---------------- EFEITO SONORO PROJETIL ------------------
-	ALLEGRO_SAMPLE* sound_projetil = NULL;
 
-	ALLEGRO_SAMPLE_INSTANCE* inst_sound_projetil = NULL;
 
-	sound_projetil = al_load_sample("sound_bullet.ogg");
+	//---------------- EFEITO SONORO DE ANDAR ------------------
+	ALLEGRO_SAMPLE* andar = NULL;
 
-	inst_sound_projetil = al_create_sample_instance(sound_projetil);
+	ALLEGRO_SAMPLE_INSTANCE* inst_andar = NULL;
 
-	al_attach_sample_instance_to_mixer(inst_sound_projetil, al_get_default_mixer());
-	al_set_sample_instance_playmode(inst_sound_projetil, ALLEGRO_PLAYMODE_BIDIR);
-	al_set_sample_instance_gain(inst_sound_projetil, 1);
+	andar = al_load_sample("andar.ogg");
+	inst_andar = al_create_sample_instance(andar);
+
+	al_attach_sample_instance_to_mixer(inst_andar, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_andar, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_andar, 0.9);
+
+
+	//---------------- EFEITO SONORO GAME OVER ------------------
+	ALLEGRO_SAMPLE* finaldejogo = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_finaldejogo = NULL;
+
+	finaldejogo = al_load_sample("finaldejogo.ogg");
+	inst_finaldejogo = al_create_sample_instance(finaldejogo);
+
+	al_attach_sample_instance_to_mixer(inst_finaldejogo, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_finaldejogo, ALLEGRO_PLAYMODE_ONCE);
+	al_set_sample_instance_gain(inst_finaldejogo, 1);
+
+
+	//---------------- EFEITO SONORO BOSS FIGHT ------------------
+	ALLEGRO_SAMPLE* bossfight = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_bossfight = NULL;
+
+	bossfight = al_load_sample("bossfight.ogg");
+	inst_bossfight = al_create_sample_instance(bossfight);
+
+	al_attach_sample_instance_to_mixer(inst_bossfight, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_bossfight, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_bossfight, 0.8);
+
+
+	//---------------- EFEITO SONORO WINNER ------------------
+	ALLEGRO_SAMPLE* winner = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_winner = NULL;
+
+	winner = al_load_sample("winner.ogg");
+	inst_winner = al_create_sample_instance(winner);
+
+	al_attach_sample_instance_to_mixer(inst_winner, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_winner, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_winner, 2);
+	/*
+	//---------------- EFEITO SONORO DAMAGE ------------------
+	ALLEGRO_SAMPLE* trilha_sonora = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
+
+	trilha_sonora = al_load_sample("trilha_sonora.ogg");
+	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
+
+	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_trilha_sonora, 2);
+
+
+	//---------------- EFEITO SONORO FIM DO JOGO ------------------
+	ALLEGRO_SAMPLE* trilha_sonora = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
+
+	trilha_sonora = al_load_sample("trilha_sonora.ogg");
+	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
+
+	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_trilha_sonora, 2);
+
+
+
+	//---------------- EFEITO SONORO TRILHA DO JOGO ------------------
+	ALLEGRO_SAMPLE* trilha_sonora = NULL;
+
+	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
+
+	trilha_sonora = al_load_sample("trilha_sonora.ogg");
+	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
+
+	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
+	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_gain(inst_trilha_sonora, 2);
+	*/
 
 
 	
@@ -172,11 +286,15 @@ int main()
 	while (!done)
 	{
 		int a = al_get_timer_count(timer2);
-		cout << a << endl;
+		int t_winner = al_get_timer_count(timer3);
+
+		ALLEGRO_TIMEOUT* tempowinner;
+
+		cout << t_winner << endl;
 		ALLEGRO_EVENT events;
 		al_wait_for_event(event_queue, &events);
 		al_get_keyboard_state(&keyState);
-		al_play_sample_instance(inst_trilha_sonora);
+		
 
 		if (events.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
@@ -305,19 +423,19 @@ int main()
 			if (tiros[ENTER])
 			{
 				al_start_timer(timer2);
-				if(a < 5)
+				if(a < 1)
 				{
 					al_clear_to_color(al_map_rgb(0, 0, 0));
 					al_draw_bitmap(imagem2, 0, 0, NULL);
 					al_flip_display();
 				}
-				if (a > 5 && a < 10)
+				if (a > 2 && a < 3)
 				{
 					al_clear_to_color(al_map_rgb(0, 0, 0));
 					al_draw_bitmap(imagem4, 0, 0, NULL);
 					al_flip_display();
 				}
-				if(a > 10)
+				if(a > 4)
 					iniciar = true;
 			}
 
@@ -325,8 +443,16 @@ int main()
 			{
 				al_draw_bitmap(mapa, 0, 0, NULL);
 
+
+				al_stop_sample_instance(inst_sound_menu);
+				al_play_sample_instance(inst_trilha_sonora);
+				
+
+
 				if (!gameover && !proximafase)
 				{
+				
+
 					DesenhaBalas(balas_c, NUM_BALAS_C, 5, r, g, b);
 					DesenhaBalas(balas_b, NUM_BALAS_B, 5, r, g, b);
 					DesenhaBalas(balas_e, NUM_BALAS_E, 5, r, g, b);
@@ -343,21 +469,27 @@ int main()
 					contador = pontos;
 					if (contador == 1 && fase == 1)
 					{
+
 						proximafase = true;
 						contador = 0;
 					}
 					if (contador == 4 && fase == 2)
-					{
+					{	
+
+
 						proximafase = true;
 						contador = 0;
 					}
 					if (contador == 7 && fase == 3)
 					{
+						
+
 						proximafase = true;
 						contador = 0;
 					}
 					if (contador == 11 && fase == 4)
 					{
+
 						proximafase = true;
 						contador = 0;
 					}
@@ -398,25 +530,43 @@ int main()
 						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, 360, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
 					}
 					if (proximafase && fase == 1)
-					{
+					{	
+						al_play_sample_instance(inst_winner);
+						al_start_timer(timer3);
+
+						
+						if (t_winner > 1) {
+							al_stop_sample_instance(inst_winner);
+							al_set_timer_count(timer3, NULL);
+							printf("---------------------------------------------------");
+						}
+						
+
 						al_clear_to_color(al_map_rgb(0, 0, 0));
 						al_draw_bitmap(pergunta, 65, 180, NULL);
 						al_flip_display();
+
+						
+
 						if (tiros[UM] && !respondido[0])
 						{
+							al_stop_sample_instance(inst_winner);
 							tiros[UM] = false;
 							respondido[0] = true;
 							personagem->vida++;
+
 							pergunta = al_load_bitmap("imagens/pergunta1-resp.png");
 						}
 						if (tiros[DOIS] && !respondido[0])
 						{
+							al_stop_sample_instance(inst_winner);
 							tiros[DOIS] = false;
 							respondido[0] = true;
 							pergunta = al_load_bitmap("imagens/pergunta1-errada1.png");
 						}
 						if (tiros[TRES] && !respondido[0])
 						{
+							al_stop_sample_instance(inst_winner);
 							tiros[TRES] = false;
 							respondido[0] = true;
 							pergunta = al_load_bitmap("imagens/pergunta1-errada2.png");
@@ -424,10 +574,19 @@ int main()
 						
 					}
 					if (proximafase && fase == 2)
-					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
-						al_draw_bitmap(pergunta2, 65, 180, NULL);
-						al_flip_display();
+					{	
+						
+
+						al_set_timer_count(timer3, NULL);
+						al_start_timer(timer3);
+						al_play_sample_instance(inst_winner);
+
+
+						if (t_winner > 1) {
+							al_stop_sample_instance(inst_winner);
+							printf("///////////////////////////////////////////");
+						}
+
 						if (tiros[UM] && !respondido[1])
 						{
 							tiros[UM] = false;
@@ -447,9 +606,13 @@ int main()
 							respondido[1] = true;
 							pergunta2 = al_load_bitmap("imagens/pergunta2-errada2.png");
 						}
+
 					}
 					if (proximafase && fase == 3)
 					{
+						
+						
+
 						al_clear_to_color(al_map_rgb(0, 0, 0));
 						al_draw_bitmap(pergunta3, 65, 180, NULL);
 						al_flip_display();
@@ -477,6 +640,9 @@ int main()
 
 					if (proximafase && fase == 4)
 					{
+
+						
+
 						al_clear_to_color(al_map_rgb(0, 0, 0));
 						al_draw_bitmap(pergunta4, 65, 180, NULL);
 						al_flip_display();
@@ -504,6 +670,9 @@ int main()
 
 					if (proximafase && fase == 5)
 					{
+
+					
+
 						al_clear_to_color(al_map_rgb(0, 0, 0));
 						al_draw_bitmap(pergunta4, 65, 180, NULL);
 						al_flip_display();
