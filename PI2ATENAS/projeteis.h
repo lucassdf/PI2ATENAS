@@ -248,8 +248,8 @@ void LiberaTiros(Atirador atirador[], int tamanho, string tipo)
 		{
 			if (!atirador[i].ativo && atirador[i].vida > 0)
 			{
-				atirador[i].x = rand() % 580 + 60;
-				atirador[i].y = rand() % 420 + 60;
+				atirador[i].x = rand() % 500 + 60;
+				atirador[i].y = rand() % 350 + 60;
 				atirador[i].ativo = true;
 
 				/*if (rand() % 500 == 0)
