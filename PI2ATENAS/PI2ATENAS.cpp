@@ -125,7 +125,7 @@ int main()
 	ALLEGRO_BITMAP* pergunta6 = al_load_bitmap("perguntas/6/1.png");
 	ALLEGRO_BITMAP* pergunta7 = al_load_bitmap("perguntas/7/1.png");
 	ALLEGRO_BITMAP* pergunta8 = al_load_bitmap("perguntas/8/1.png");
-	ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
+	ALLEGRO_BITMAP* enemy = al_load_bitmap("inimigos/papel.png");
     ALLEGRO_KEYBOARD_STATE keyState;
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_TIMER* timer2 = al_create_timer(1);
@@ -318,7 +318,7 @@ int main()
 					al_draw_bitmap(imagem4, 0, 0, NULL);
 					al_flip_display();
 				}
-				if(a > 30)
+				if(a > 2)
 					iniciar = true;
 			}
 
@@ -649,7 +649,7 @@ int main()
 							corAtirador = 4;
 							fase++;
 							mapa = al_load_bitmap("mapas/bosque2.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/papel.png");
 							//lixeira = al_load_bitmap("imagens/azul.png");
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
 							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
@@ -667,7 +667,7 @@ int main()
 							corAtirador = 3;
 							fase++;
 							mapa = al_load_bitmap("mapas/cidade1.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/metal.png");
 							lixeira = al_load_bitmap("imagens/amarela.png");
 							r2 = 249, g2 = 189, b2 = 0;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
@@ -686,7 +686,7 @@ int main()
 							corAtirador = 3;
 							fase++;
 							mapa = al_load_bitmap("mapas/cidade2.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/metal.png");
 							lixeira = al_load_bitmap("imagens/amarela.png");
 							r2 = 249, g2 = 189, b2 = 0;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
