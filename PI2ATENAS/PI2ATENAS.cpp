@@ -67,6 +67,7 @@ int main()
 	int x = 10, y = 10, moveSpeed = 5, pontos = 0, contador = 0, r = 0, g = 138, b = 200, r2 = 0, g2 = 138, b2 = 200, corBala = 4, corAtirador = 4;
 	int dir = DOWN, dir2 = 1, dir3 = 0, prevDir = 0, fase = 1;
 	bool tiros[] = {false, false, false, false, false, false, false, false, false, false, false, false, false};
+	bool historia = true, comandos = true, inicio = false;
 	
 	// ------------ INICIALIZA��O DE OBJETOS --------------
 	Atirador personagem[NUM_PERSONAGEM];
@@ -101,7 +102,7 @@ int main()
 
 	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
 	ALLEGRO_FONT* font = al_load_font("fontes/Minecraft.ttf", 25, NULL);
-	ALLEGRO_FONT* font2 = al_load_font("fontes/Minecraft.ttf", 14, NULL);
+	ALLEGRO_FONT* font2 = al_load_font("fontes/Minecraft.ttf", 12, NULL);
 	ALLEGRO_BITMAP* playerWalk[12];
 	for (int i = 0; i < 12; i++)
 	{
@@ -112,6 +113,8 @@ int main()
 
 	ALLEGRO_BITMAP* mapa = al_load_bitmap("mapas/bosque1.png");
 	ALLEGRO_BITMAP* lixeira = al_load_bitmap("imagens/azul.png");
+	ALLEGRO_BITMAP* enter = al_load_bitmap("imagens/enter.png");
+	ALLEGRO_BITMAP* coracao = al_load_bitmap("inimigos/coracao_vermelho.png");
 	ALLEGRO_BITMAP* imagem1 = al_load_bitmap("imagens/inicio.png");
 	ALLEGRO_BITMAP* imagem2 = al_load_bitmap("imagens/historia.png");
 	ALLEGRO_BITMAP* imagem3 = al_load_bitmap("imagens/gameover.png");
@@ -173,7 +176,7 @@ int main()
 	while (!done)
 	{
 		int a = al_get_timer_count(timer2);
-		cout << a << endl;
+		//cout << a << endl;
 		ALLEGRO_EVENT events;
 		al_wait_for_event(event_queue, &events);
 		al_get_keyboard_state(&keyState);
@@ -303,24 +306,38 @@ int main()
 		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
 		if (draw)
 		{	
+			cout << a << endl;
 			if (tiros[ENTER])
 			{
 				al_start_timer(timer2);
-				if(a < 15)
-				{
-					al_clear_to_color(al_map_rgb(0, 0, 0));
-					al_draw_bitmap(imagem2, 0, 0, NULL);
-					al_flip_display();
-				}
-				if (a > 15 && a < 25)
-				{
-					al_clear_to_color(al_map_rgb(0, 0, 0));
-					al_draw_bitmap(imagem4, 0, 0, NULL);
-					al_flip_display();
-				}
-				if(a > 2)
-					iniciar = true;
 			}
+
+			if (a>1 && a<20)
+			{
+				//al_clear_to_color(al_map_rgb(0, 0, 0));
+				al_draw_bitmap(imagem2, 0, 0, NULL);
+				//al_draw_textf(font2, al_map_rgb(255, 255, 255), 400, 450, NULL, "APERTE ENTER PARA CONTINUAR");
+				al_flip_display();
+			}
+
+			if (a>20 && inicio == false)
+			{
+				al_clear_to_color(al_map_rgb(27, 111, 27));
+				al_draw_bitmap(imagem4, 0, 0, NULL);
+				al_draw_textf(font2, al_map_rgb(255, 255, 255), 400, 450, NULL, "APERTE ENTER PARA CONTINUAR");
+				al_flip_display();
+				//inicio = true;
+				if (tiros[ENTER])
+				{
+					inicio = true;
+				}
+			}
+
+			if (inicio)
+			{
+				iniciar = true;
+			}
+				
 
 			if (iniciar)
 			{
@@ -332,9 +349,9 @@ int main()
 					DesenhaBalas(balas_b, NUM_BALAS_B, 5, r, g, b);
 					DesenhaBalas(balas_e, NUM_BALAS_E, 5, r, g, b);
 					DesenhaBalas(balas_d, NUM_BALAS_D, 5, r, g, b);
-					DesenhaAtirador(enemy, playerWalk, atirador, NUM_ATIRADOR, "atirador");
+					DesenhaAtirador(enemy, playerWalk, atirador, NUM_ATIRADOR, "atirador", font2, coracao);
 					DesenhaBalas(balas, NUM_BALASATIRADOR, 8, r2, g2, b2);
-					DesenhaAtirador(enemy, playerWalk, personagem, NUM_PERSONAGEM, "personagem"); 
+					DesenhaAtirador(enemy, playerWalk, personagem, NUM_PERSONAGEM, "personagem", font2, coracao); 
 					al_draw_textf(font, al_map_rgb(255, 255, 255), 165, 15, NULL, "%d", personagem->vida);
 					al_draw_filled_circle(280, 25, 10, al_map_rgb(r, g, b));
 					al_draw_bitmap(lixeira, 240, 8, NULL);
@@ -393,23 +410,27 @@ int main()
 				{
 					if (gameover)
 					{ 
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(imagem3, 0, 0, NULL);
 						al_flip_display();
 						//al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
-						al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, 360, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
+						al_draw_textf(font, al_map_rgb(255, 255, 255), largura / 2, 360, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
 					}
 					if (proximafase && fase == 1)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[0])
 						{
+							al_clear_to_color(al_map_rgb(27, 111, 27));
 							tiros[UM] = false;
 							respondido[0] = true;
 							personagem->vida++;
 							pergunta = al_load_bitmap("perguntas/1/4.png");
+							//al_draw_bitmap(enter, 400, 450, NULL);
+							//al_flip_display();
 						}
 						if (tiros[DOIS] && !respondido[0])
 						{
@@ -427,9 +448,10 @@ int main()
 					}
 					if (proximafase && fase == 2)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta2, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[1])
 						{
 							tiros[UM] = false;
@@ -452,9 +474,10 @@ int main()
 					}
 					if (proximafase && fase == 3)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta3, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[2])
 						{
 							tiros[UM] = false;
@@ -479,9 +502,10 @@ int main()
 
 					if (proximafase && fase == 4)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta4, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[3])
 						{
 							tiros[UM] = false;
@@ -506,9 +530,10 @@ int main()
 
 					if (proximafase && fase == 5)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta5, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[4])
 						{
 							tiros[UM] = false;
@@ -533,9 +558,10 @@ int main()
 
 					if (proximafase && fase == 6)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta6, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[5])
 						{
 							tiros[UM] = false;
@@ -560,9 +586,10 @@ int main()
 
 					if (proximafase && fase == 7)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta7, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[6])
 						{
 							tiros[UM] = false;
@@ -587,9 +614,10 @@ int main()
 
 					if (proximafase && fase == 8)
 					{
-						al_clear_to_color(al_map_rgb(0, 0, 0));
+						al_clear_to_color(al_map_rgb(27, 111, 27));
 						al_draw_bitmap(pergunta8, 0, 0, NULL);
-						al_flip_display();
+						al_draw_textf(font2, al_map_rgb(255, 255, 255), 290, 450, NULL, "RESPONDA E DEPOIS APERTE ENTER PARA CONTINUAR");
+						//al_flip_display();
 						if (tiros[UM] && !respondido[7])
 						{
 							tiros[UM] = false;

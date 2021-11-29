@@ -45,7 +45,7 @@ void LiberaTiros(Atirador atirador[], int tamanho, string tipo);
 void AtualizaAtirador(Atirador atirador[], float  alt, float larg, int tamanho);
 void InitBalas(Projeteis balas[], int tamanho, string tipo, int velocidade, int corBala);
 void AtualizaBalas(Projeteis balas[], int tamanho);
-void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk, Atirador atirador[], int tamanho, string tipo, int index);
+void DesenhaAtirador(ALLEGRO_BITMAP* playerWalk, Atirador atirador[], int tamanho, string tipo, int index, ALLEGRO_FONT* font, ALLEGRO_BITMAP* coracao);
 void move_personagem(ALLEGRO_KEYBOARD_STATE keyState, Atirador atirador[], int tamanho_a, int alt, int larg, bool* draw, int* prevDir, int index);
 
 
@@ -211,7 +211,7 @@ void AtualizaAtirador(Atirador atirador[], float  alt, float larg, int tamanho)
 
 	}
 }
-void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int tamanho, string tipo)
+void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atirador atirador[], int tamanho, string tipo, ALLEGRO_FONT* font, ALLEGRO_BITMAP* coracao)
 {
 
 	//ALLEGRO_BITMAP* enemy = al_load_bitmap("trash.png");
@@ -223,6 +223,8 @@ void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atir
 			{
 				al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgba(0,0, 0, 0));
 				al_draw_bitmap(enemy, atirador[i].x - 16, atirador[i].y - 16, NULL);
+				al_draw_textf(font, al_map_rgb(255, 255, 255), atirador[i].x-10, atirador[i].y+19, NULL, "%d", atirador[i].vida);
+				al_draw_bitmap(coracao, atirador[i].x, atirador[i].y + 18, NULL);
 			}
 		}
 	}
@@ -251,8 +253,8 @@ void LiberaTiros(Atirador atirador[], int tamanho, string tipo)
 		{
 			if (!atirador[i].ativo && atirador[i].vida > 0)
 			{
-				atirador[i].x = rand() % 500 + 60;
-				atirador[i].y = rand() % 350 + 60;
+				atirador[i].x = rand() % 500 + 100;
+				atirador[i].y = rand() % 350 + 100;
 				atirador[i].ativo = true;
 
 				/*if (rand() % 500 == 0)
