@@ -385,7 +385,7 @@ int main()
 					}
 					if(contador == 30 && fase == 9)
 					{
-						fimdejogo = true;
+						proximafase = true;
 						contador = 0;
 					}
 				}
@@ -590,19 +590,19 @@ int main()
 						al_clear_to_color(al_map_rgb(0, 0, 0));
 						al_draw_bitmap(pergunta8, 0, 0, NULL);
 						al_flip_display();
-						if (tiros[UM] && !respondido[6])
+						if (tiros[UM] && !respondido[7])
 						{
 							tiros[UM] = false;
 							respondido[7] = true;
 							pergunta8 = al_load_bitmap("perguntas/8/2.png");
 						}
-						if (tiros[DOIS] && !respondido[6])
+						if (tiros[DOIS] && !respondido[7])
 						{
 							tiros[DOIS] = false;
 							respondido[7] = true;
 							pergunta8 = al_load_bitmap("perguntas/8/3.png");
 						}
-						if (tiros[TRES] && !respondido[6])
+						if (tiros[TRES] && !respondido[7])
 						{
 							tiros[TRES] = false;
 							respondido[7] = true;
@@ -619,8 +619,6 @@ int main()
 						al_flip_display();
 
 					}
-
-
 
 					if (tiros[ENTER])
 					{
@@ -781,9 +779,9 @@ int main()
 							corAtirador = 5;
 							fase++;
 							mapa = al_load_bitmap("mapas/lixao3.png");
-							enemy = al_load_bitmap("inimigos/boss1.png");
+							enemy = al_load_bitmap("inimigos/boss5.png");
 							lixeira = al_load_bitmap("imagens/marrom.png");
-							r2 = 105, g2 = 66, b2 = 54;
+							r2 = 75, g2 = 54, b2 = 33;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
 							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
 							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
@@ -792,6 +790,11 @@ int main()
 							InitBalas(balas, NUM_BALASATIRADOR, "atirador", 10, 0);
 							proximafase = false;
 							tiros[ENTER] = false;
+						}
+
+						if (proximafase && fase == 9)
+						{
+							done = true;
 						}
 
 					}
