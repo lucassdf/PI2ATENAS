@@ -5,7 +5,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projeteis.h" />
-    <ClInclude Include="imagens.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

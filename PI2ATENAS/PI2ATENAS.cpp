@@ -12,13 +12,10 @@
 #include <time.h>
 #include <string>
 #include "projeteis.h"
-#include "imagens.h"
 #include <sstream>
 using namespace std;
 
-
-
-// -------- VARIAVEIS GLOBAIS/CONSTANTES E INICIALIZACAO DE OBJETOS ----------
+// -------- VARIAVEIS GLOBAIS DE PROJETEIS E ATIRADORES----------
 const int NUM_BALAS_C = 10;
 const int NUM_BALAS_B = 10;
 const int NUM_BALAS_E = 10;
@@ -26,13 +23,6 @@ const int NUM_BALAS_D = 10;
 const int NUM_ATIRADOR = 10;
 const int NUM_BALASATIRADOR = 5;
 const int NUM_PERSONAGEM = 1;
-
-
-// ---------- PROTÓTIPOS -------------
-Projeteis balas_c[NUM_BALAS_C];
-Projeteis balas_b[NUM_BALAS_B];
-Projeteis balas_e[NUM_BALAS_E];
-Projeteis balas_d[NUM_BALAS_D];
 
 //DEFINICAO DO FPS
 const float FPS = 60.0;
@@ -45,7 +35,7 @@ int main()
 	//DEFINICAO DA VARIAVEL DE DISPLAY DO ALLEGRO	
 	ALLEGRO_DISPLAY* display;
 
-	//DEFINICAO DAS TECLAS DE DIRECAO
+	//DEFINICAO DAS TECLAS DE DIRECAO, PROJETEIS E DEMAIS TECLAS DO JOGO
 	enum Direction { DOWN = 0, LEFT = 3, RIGHT = 6, UP = 9};
 	enum TIROS { CIMA, BAIXO, ESQUERDA, DIREITA, ENTER, UM, DOIS, TRES, F1, F2, F3, F4, F5};
 
@@ -69,7 +59,7 @@ int main()
 	bool tiros[] = {false, false, false, false, false, false, false, false, false, false, false, false, false};
 	bool historia = true, comandos = true, inicio = false;
 	
-	// ------------ INICIALIZA��O DE OBJETOS --------------
+	// ------------ INICIALIZACAO DOS PROTOTIPOS DOS ATIRADORES E PROJETEIS --------------
 	Atirador personagem[NUM_PERSONAGEM];
 	Projeteis balas_c[NUM_BALAS_C];
 	Projeteis balas_b[NUM_BALAS_B];
@@ -79,7 +69,7 @@ int main()
 	Projeteis balas[NUM_BALASATIRADOR];
 
 
-	// -------- FUN��ES INICIAIS ---------------
+	// -------- FUNCOES INICIAIS DOS PROJETEIS E ATIRADORES ---------------
 	InitAtirador(personagem, NUM_PERSONAGEM, "personagem", 5, 5.0, 0);
 	InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
 	InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
@@ -100,9 +90,13 @@ int main()
 	al_init_primitives_addon();
 	al_reserve_samples(10);
 
-	//INICIALIZACAO DOS EVENTOS DO ALLEGRO (TEXTO, PERSONAGEM, FILA DE EVENTOS E ETC)
+	//------------INICIALIZACAO DOS EVENTOS DO ALLEGRO---------------
+	
+	//TEXTO
 	ALLEGRO_FONT* font = al_load_font("fontes/Minecraft.ttf", 25, NULL);
 	ALLEGRO_FONT* font2 = al_load_font("fontes/Minecraft.ttf", 12, NULL);
+
+	//BITMAP DO PERSONAGEM
 	ALLEGRO_BITMAP* playerWalk[12];
 	for (int i = 0; i < 12; i++)
 	{
@@ -111,6 +105,7 @@ int main()
 		playerWalk[i] = al_load_bitmap(str.str().c_str());
 	}
 
+	//BITMAPS DO MAPA, IMAGENS E PERGUNTAS
 	ALLEGRO_BITMAP* mapa = al_load_bitmap("mapas/bosque1.png");
 	ALLEGRO_BITMAP* lixeira = al_load_bitmap("imagens/azul.png");
 	ALLEGRO_BITMAP* enter = al_load_bitmap("imagens/enter.png");
@@ -128,30 +123,34 @@ int main()
 	ALLEGRO_BITMAP* pergunta6 = al_load_bitmap("perguntas/6/1.png");
 	ALLEGRO_BITMAP* pergunta7 = al_load_bitmap("perguntas/7/1.png");
 	ALLEGRO_BITMAP* pergunta8 = al_load_bitmap("perguntas/8/1.png");
+
+	//BITMAP DO INIMIGO
 	ALLEGRO_BITMAP* enemy = al_load_bitmap("inimigos/papel.png");
+
+	//EVENTO DE TECLADO
     ALLEGRO_KEYBOARD_STATE keyState;
+
+	//TIMERS
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / FPS);
 	ALLEGRO_TIMER* timer2 = al_create_timer(1);
-	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 
+	//FILA DE EVENTOS
+	ALLEGRO_EVENT_QUEUE* event_queue = al_create_event_queue();
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 
+	//TRILHA SONORA
 	ALLEGRO_SAMPLE* trilha_sonora = NULL;
 	ALLEGRO_SAMPLE* projeteis_lancados = NULL;
-
 	ALLEGRO_SAMPLE_INSTANCE* inst_projeteis_lancados = NULL;
 	ALLEGRO_SAMPLE_INSTANCE* inst_trilha_sonora = NULL;
-
 	trilha_sonora = al_load_sample("trilha_sonora.ogg");
 	inst_trilha_sonora = al_create_sample_instance(trilha_sonora);
-
 	al_attach_sample_instance_to_mixer(inst_trilha_sonora, al_get_default_mixer());
 	al_set_sample_instance_playmode(inst_trilha_sonora, ALLEGRO_PLAYMODE_LOOP);
 	al_set_sample_instance_gain(inst_trilha_sonora, 0.3);
 
-	//---------------- EFEITO SONORO PROJETIL ------------------
 	ALLEGRO_SAMPLE* sound_projetil = NULL;
 
 	ALLEGRO_SAMPLE_INSTANCE* inst_sound_projetil = NULL;
@@ -164,8 +163,6 @@ int main()
 	al_set_sample_instance_playmode(inst_sound_projetil, ALLEGRO_PLAYMODE_BIDIR);
 	al_set_sample_instance_gain(inst_sound_projetil, 1);
 
-
-	
 	//LOOP CONTENDO A LOGICA DO JOGO
 	srand(time(NULL));
 	al_start_timer(timer);
@@ -187,6 +184,7 @@ int main()
 			done = true;
 		}
 
+		//IMPLEMENTACAO DO CODIGO QUE CADA TECLA ACIONA AO SER PRESSIONADA
 		else if (events.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			switch (events.keyboard.keycode)
@@ -274,7 +272,8 @@ int main()
 		else if (events.type == ALLEGRO_EVENT_TIMER)
 		{
 			active = true;
-	
+				
+			//ATUALIZACAO DOS PROJETEIS NA TELA QUANDO DISPARADOS
 				tiros[ENTER] = false;
 				if (tiros[DIREITA])
 					AtualizaBalas(balas_d, NUM_BALAS_D, personagem, NUM_PERSONAGEM, largura, altura);
@@ -287,6 +286,7 @@ int main()
 
 				if (!gameover)
 				{
+					//ATUALIZAÇAO DOS PROJETEIS, PERSONAGEM E INIMIGOS NA TELA
 					AtiraBalas(balas, NUM_BALASATIRADOR, atirador, NUM_ATIRADOR, tiros, "atirador", 0);
 					AtualizaBalas(balas, NUM_BALASATIRADOR, personagem, NUM_PERSONAGEM, largura, altura);
 					LiberaTiros(atirador, NUM_ATIRADOR, "atirador");
@@ -294,6 +294,7 @@ int main()
 					LiberaTiros(personagem, NUM_ATIRADOR, "personagem");
 					AtualizaAtirador(atirador, altura, largura, NUM_ATIRADOR);
 
+					//COLISAO DOS PROJETEIS COM O INIMIGO E PERSONAGEM
 					BalaColidida(balas, NUM_BALASATIRADOR, personagem, NUM_PERSONAGEM, "atirador", &pontos, corBala, corAtirador);
 					BalaColidida(balas_b, NUM_BALAS_B, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
 					BalaColidida(balas_c, NUM_BALAS_C, atirador, NUM_ATIRADOR, "personagem", &pontos, corBala, corAtirador);
@@ -303,9 +304,10 @@ int main()
 				}
 				
 		}
-		//DESENHO DO PERSONAGEM, INIMIGO, TELA, TEXTO E ETC
+		//LOGICA DE DESENHOS DO JOGO
 		if (draw)
 		{	
+			//DESENHO DAS TELAS INICIAIS DE HISTORIA E COMANDOS
 			cout << a << endl;
 			if (tiros[ENTER])
 			{
@@ -345,21 +347,29 @@ int main()
 
 				if (!gameover && !proximafase)
 				{
+					//DESENHO DOS PROJETEIS, INIMIGOS E PERSONAGEM
 					DesenhaBalas(balas_c, NUM_BALAS_C, 5, r, g, b);
 					DesenhaBalas(balas_b, NUM_BALAS_B, 5, r, g, b);
 					DesenhaBalas(balas_e, NUM_BALAS_E, 5, r, g, b);
 					DesenhaBalas(balas_d, NUM_BALAS_D, 5, r, g, b);
 					DesenhaAtirador(enemy, playerWalk, atirador, NUM_ATIRADOR, "atirador", font2, coracao);
 					DesenhaBalas(balas, NUM_BALASATIRADOR, 8, r2, g2, b2);
-					DesenhaAtirador(enemy, playerWalk, personagem, NUM_PERSONAGEM, "personagem", font2, coracao); 
+					DesenhaAtirador(enemy, playerWalk, personagem, NUM_PERSONAGEM, "personagem", font2, coracao);
+
+					//DESENHO DA BARRA SUPERIOR DE CONSULTA
 					al_draw_textf(font, al_map_rgb(255, 255, 255), 165, 15, NULL, "%d", personagem->vida);
 					al_draw_filled_circle(280, 25, 10, al_map_rgb(r, g, b));
 					al_draw_bitmap(lixeira, 240, 8, NULL);
 					al_draw_textf(font, al_map_rgb(255, 255, 255), 430, 12, NULL, "%d", fase);
 					al_draw_textf(font, al_map_rgb(255, 255, 255), 580, 15, NULL, "%d", pontos);
+
+					//ACIONAMENTO DO GAMEOVER
 					if (personagem->vida <= 0)
 						gameover = true;
+
 					contador = pontos;
+
+					//LOGICA PARA PROSSEGUIMENTO DE FASES
 					if (contador == 1 && fase == 1)
 					{
 						proximafase = true;
@@ -400,7 +410,7 @@ int main()
 						proximafase = true;
 						contador = 0;
 					}
-					if(contador == 30 && fase == 9)
+					if (contador == 30 && fase == 9)
 					{
 						proximafase = true;
 						contador = 0;
@@ -408,6 +418,7 @@ int main()
 				}
 				else
 				{
+					//DESENHO DA TELA DE GAMEOVER
 					if (gameover)
 					{ 
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -416,6 +427,7 @@ int main()
 						//al_draw_textf(font2, al_map_rgb(255, 255, 255), largura / 2, altura / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER: VOCE PERDEU TODAS AS VIDAS, COMECE NOVAMENTE");
 						al_draw_textf(font, al_map_rgb(255, 255, 255), largura / 2, 360, ALLEGRO_ALIGN_CENTRE, "SEUS PONTOS FORAM: %d", pontos);
 					}
+					//DESENHO DA PERGUNTA 1
 					if (proximafase && fase == 1)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -446,6 +458,7 @@ int main()
 						}
 						
 					}
+					//DESENHO DA PERGUNTA 2
 					if (proximafase && fase == 2)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -472,6 +485,7 @@ int main()
 							pergunta2 = al_load_bitmap("perguntas/2/4.png");
 						}
 					}
+					//DESENHO DA PERGUNTA 3
 					if (proximafase && fase == 3)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -499,7 +513,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA PERGUNTA 4
 					if (proximafase && fase == 4)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -527,7 +541,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA PERGUNTA 5
 					if (proximafase && fase == 5)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -555,7 +569,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA PERGUNTA 6
 					if (proximafase && fase == 6)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -583,7 +597,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA PERGUNTA 7
 					if (proximafase && fase == 7)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -611,7 +625,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA PERGUNTA 8
 					if (proximafase && fase == 8)
 					{
 						al_clear_to_color(al_map_rgb(27, 111, 27));
@@ -639,7 +653,7 @@ int main()
 						}
 
 					}
-
+					//DESENHO DA TELA DE GAME WIN
 					if (proximafase && fase == 9)
 					{
 						al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -650,6 +664,7 @@ int main()
 
 					if (tiros[ENTER])
 					{
+						//SE GAME OVER A TELA FECHA
 						if (gameover)
 						{
 							done = true;
@@ -668,6 +683,7 @@ int main()
 							tiros[ENTER] = false;
 							pontos = 0;*/
 						}
+						// INICIALIZACAO DA FASE 2
 						if (proximafase && fase == 1)
 						{
 							personagem->x = 50;
@@ -686,6 +702,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 3
 						if (proximafase && fase == 2)
 						{
 							personagem->x = 50;
@@ -705,6 +722,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 4
 						if (proximafase && fase == 3)
 						{
 							personagem->x = 50;
@@ -724,6 +742,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 5
 						if (proximafase && fase == 4)
 						{
 							personagem->x = 50;
@@ -743,6 +762,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 6
 						if (proximafase && fase == 5)
 						{
 							personagem->x = 50;
@@ -762,6 +782,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 7
 						if (proximafase && fase == 6)
 						{
 							personagem->x = 50;
@@ -781,6 +802,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 8
 						if (proximafase && fase == 7)
 						{
 							personagem->x = 50;
@@ -800,6 +822,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
+						// INICIALIZACAO DA FASE 9 (BOSS)
 						if (proximafase && fase == 8)
 						{
 							personagem->x = 50;
@@ -809,7 +832,7 @@ int main()
 							mapa = al_load_bitmap("mapas/lixao3.png");
 							enemy = al_load_bitmap("inimigos/boss5.png");
 							lixeira = al_load_bitmap("imagens/marrom.png");
-							r2 = 75, g2 = 54, b2 = 33;
+							r2 = 50, g2 = 30, b2 = 0;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
 							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
 							InitBalas(balas_e, NUM_BALAS_E, "personagem", 10, corBala);
@@ -819,7 +842,7 @@ int main()
 							proximafase = false;
 							tiros[ENTER] = false;
 						}
-
+						// SE GAME WIN A TELA FECHA
 						if (proximafase && fase == 9)
 						{
 							done = true;
@@ -852,11 +875,6 @@ int main()
 	al_destroy_sample_instance(inst_projeteis_lancados);
 
 	return 0;
-
-
-
-
-
 
 }
 
