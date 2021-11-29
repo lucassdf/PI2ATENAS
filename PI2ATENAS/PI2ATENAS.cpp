@@ -649,7 +649,7 @@ int main()
 							corAtirador = 4;
 							fase++;
 							mapa = al_load_bitmap("mapas/bosque2.png");
-							enemy = al_load_bitmap("inimigos/papel.png");
+							enemy = al_load_bitmap("inimigos/papel2.png");
 							//lixeira = al_load_bitmap("imagens/azul.png");
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
 							InitBalas(balas_b, NUM_BALAS_B, "personagem", 10, corBala);
@@ -686,7 +686,7 @@ int main()
 							corAtirador = 3;
 							fase++;
 							mapa = al_load_bitmap("mapas/cidade2.png");
-							enemy = al_load_bitmap("inimigos/metal.png");
+							enemy = al_load_bitmap("inimigos/metal2.png");
 							lixeira = al_load_bitmap("imagens/amarela.png");
 							r2 = 249, g2 = 189, b2 = 0;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
@@ -705,7 +705,7 @@ int main()
 							corAtirador = 2;
 							fase++;
 							mapa = al_load_bitmap("mapas/deserto1.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/plastico.png");
 							lixeira = al_load_bitmap("imagens/vermelha.png");
 							r2 = 195, g2 = 52, b2 = 48;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
@@ -724,7 +724,7 @@ int main()
 							corAtirador = 2;
 							fase++;
 							mapa = al_load_bitmap("mapas/deserto2.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/plastico2.png");
 							lixeira = al_load_bitmap("imagens/vermelha.png");
 							r2 = 195, g2 = 52, b2 = 48;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
@@ -743,7 +743,7 @@ int main()
 							corAtirador = 1;
 							fase++;
 							mapa = al_load_bitmap("mapas/lixao1.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/vidro.png");
 							lixeira = al_load_bitmap("imagens/verde.png");
 							r2 = 0, g2 = 177, b2 = 78;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);
@@ -762,7 +762,7 @@ int main()
 							corAtirador = 1;
 							fase++;
 							mapa = al_load_bitmap("mapas/lixao2.png");
-							enemy = al_load_bitmap("trash.png");
+							enemy = al_load_bitmap("inimigos/vidro2.png");
 							lixeira = al_load_bitmap("imagens/verde.png");
 							r2 = 0, g2 = 177, b2 = 78;
 							InitBalas(balas_c, NUM_BALAS_C, "personagem", 10, corBala);

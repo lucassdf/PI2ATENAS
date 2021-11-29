@@ -221,7 +221,7 @@ void DesenhaAtirador(ALLEGRO_BITMAP* enemy, ALLEGRO_BITMAP* playerWalk[12], Atir
 		{
 			if (atirador[i].ativo)
 			{
-				al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgb(0, 0, 0));
+				al_draw_filled_circle(atirador[i].x, atirador[i].y, 20, al_map_rgba(0,0, 0, 0));
 				al_draw_bitmap(enemy, atirador[i].x - 16, atirador[i].y - 16, NULL);
 			}
 		}
