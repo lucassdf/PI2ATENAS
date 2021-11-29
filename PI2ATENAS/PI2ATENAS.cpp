@@ -261,9 +261,9 @@ int main()
 				break;
 			case ALLEGRO_KEY_F5:
 				tiros[F5] = true;
-				r = 105;
-				g = 66;
-				b = 54;
+				r = 50;
+				g = 30;
+				b = 0;
 				marrom = true;
 				corBala = 5;
 				break;
